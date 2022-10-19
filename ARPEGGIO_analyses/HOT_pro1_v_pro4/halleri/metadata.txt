@@ -1,0 +1,6 @@
+name	type	origin	condition
+LL_hal_G1_1	PE	parent1	A
+LL_hal_G1_2	PE	parent1	A
+LL_hal_G1_3	PE	parent1	A
+LL_hal_G4_1	PE	parent1	B
+LL_hal_G4_2	PE	parent1	B

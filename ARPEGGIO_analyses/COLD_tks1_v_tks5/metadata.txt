@@ -1,0 +1,7 @@
+name	type	origin	condition
+HM_TKS_G1_1	PE	allopolyploid	A
+HM_TKS_G1_2	PE	allopolyploid	A
+HM_TKS_G1_3	PE	allopolyploid	A
+HM_TKS_G5_1	PE	allopolyploid	B
+HM_TKS_G5_2	PE	allopolyploid	B
+HM_TKS_G5_3	PE	allopolyploid	B

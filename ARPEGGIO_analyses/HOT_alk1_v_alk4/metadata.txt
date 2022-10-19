@@ -1,0 +1,7 @@
+name	type	origin	condition
+LL_ALK_G1_1	PE	allopolyploid	A
+LL_ALK_G1_2	PE	allopolyploid	A
+LL_ALK_G1_3	PE	allopolyploid	A
+LL_ALK_G4_1	PE	allopolyploid	B
+LL_ALK_G4_2	PE	allopolyploid	B
+LL_ALK_G4_3	PE	allopolyploid	B

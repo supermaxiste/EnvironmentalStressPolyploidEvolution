@@ -1,0 +1,6 @@
+name	type	origin	condition
+LL_lyr_G1_1	PE	parent2	A
+LL_lyr_G1_2	PE	parent2	A
+LL_lyr_G1_3	PE	parent2	A
+LL_lyr_G4_1	PE	parent2	B
+LL_lyr_G4_2	PE	parent2	B
