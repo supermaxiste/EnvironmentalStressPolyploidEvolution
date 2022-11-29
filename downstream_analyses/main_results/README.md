@@ -20,13 +20,13 @@ TBD
 Package requirements: `tidyverse`, `data.table` and `patchwork`
 Script: `Fig3a_DotplotGlobalMethylationLevel.R`
 Data: `data/Fig3a`
-Details: To find out how to obtain the data used, refer to the `METHImpute_analyses` folder from the main repository ((direct link)[https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/METHImpute_analyses]). 
+Details: To find out how to obtain the data used, refer to the `METHImpute_analyses` folder from the main repository ([direct link](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/METHImpute_analyses)). 
 
 ### Figure 3b
 
 Package requirements: `tidyverse`, `data.table`, `patchwork` and `limma`
 Script: `Fig3b_MDSplot.R`
-Data: on Figshare following (this link)[https://figshare.com/projects/Data_for_MDS_analyses/134765].
+Data: on Figshare following [this link](https://figshare.com/projects/Data_for_MDS_analyses/13476).
 Details: To find out how to obtain the data used, refer to the README in `data/MDS_analyses`
 
 ## Figure 4
