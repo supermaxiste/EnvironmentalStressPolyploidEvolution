@@ -1,0 +1,3 @@
+Var1 Freq
+1 Unmethylated 56219341
+2 Methylated 15935843
