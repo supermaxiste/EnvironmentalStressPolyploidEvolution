@@ -11,23 +11,26 @@ To find which script is related to which result and the data required, use the i
 
 ## Figure 2
 
-TBD
+Package requirements: `circlize`, `GenomicRanges` and `ComplexHeatmap`
+Script: `Fig2_CirclizeHeatmap.R`
+Data: `data/Fig2`
+Details: the input data used for this figure is from data for Fig.3a ( link)[https://figshare.com/projects/Data_for_MDS_analyses/134765] and Bismark coverage files that can be found (here)[https://doi.org/10.5281/zenodo.7323783]. The pipeline to generate this figure is explained in detail in the `data/Fig2` folder.
 
 ## Figure 3
 
 ### Figure 3a
 
-Package requirements: `tidyverse`, `data.table` and `patchwork`
-Script: `Fig3a_DotplotGlobalMethylationLevel.R`
-Data: `data/Fig3a`
-Details: To find out how to obtain the data used, refer to the `METHImpute_analyses` folder from the main repository ((direct link)[https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/METHImpute_analyses]). 
+Package requirements: `tidyverse`, `data.table`, `patchwork` and `limma`
+Script: `Fig3a_MDSplot.R`
+Data: on Figshare following (this link)[https://figshare.com/projects/Data_for_MDS_analyses/134765].
+Details: To find out how to obtain the data used, refer to the README in `data/MDS_analyses`
 
 ### Figure 3b
 
-Package requirements: `tidyverse`, `data.table`, `patchwork` and `limma`
-Script: `Fig3b_MDSplot.R`
-Data: on Figshare following (this link)[https://figshare.com/projects/Data_for_MDS_analyses/134765].
-Details: To find out how to obtain the data used, refer to the README in `data/MDS_analyses`
+Package requirements: `tidyverse`, `data.table` and `patchwork`
+Script: `Fig3b_DotplotGlobalMethylationLevel.R`
+Data: `data/Fig3b`
+Details: To find out how to obtain the data used, refer to the `METHImpute_analyses` folder from the main repository ((direct link)[https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/METHImpute_analyses]).
 
 ## Figure 4
 
