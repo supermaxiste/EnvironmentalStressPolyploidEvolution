@@ -22,7 +22,7 @@ Details: the input data used for this figure is from data for Fig.3a [link](http
 
 Package requirements: `tidyverse`, `data.table`, `patchwork` and `limma`  
 Script: `Fig3a_MDSplot.R`  
-Data: on Figshare following [this link](https://figshare.com/projects/Data_for_MDS_analyses/134765).
+Data: on Figshare following [this link](https://figshare.com/projects/Data_for_MDS_analyses/134765).  
 Details: To find out how to obtain the data used, refer to the README in `data/Fig3a`
 
 ### Figure 3b
