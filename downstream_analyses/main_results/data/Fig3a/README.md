@@ -1,6 +1,6 @@
 ## MDS analyses
 
-The starting point of MDS analyses are `cov` files from Bismark which can be obtained from ARPEGGIO runs. If these files are not available, we provide the final files used for MDS plotting (after performing all of the steps outlined below). To perform the analyses for all progenitors' sides and conditions, there are a total of 95 files. Cold conditions has 48 files and includes the following samples:
+The starting point of MDS analyses are `cov` files from Bismark which can be obtained from ARPEGGIO runs and also found [here](https://doi.org/10.5281/zenodo.7323783). We also provide the [final files](https://figshare.com/projects/Data_for_MDS_analyses/134765) used for MDS plotting (after performing all of the steps outlined below). To perform the analyses for all progenitors' sides and conditions, there are a total of 95 files. Cold conditions has 48 files and includes the following samples:
 
  - _A. halleri_ generation 1 (3 replicates)
  - _A. halleri_ generation 4 (3 replicates)
@@ -308,4 +308,4 @@ awk -F " " '{ if(($3 >= 3) && ($5 >= 3) && ($7 >= 3) && ($9 >= 3) && ($11 >= 3) 
 echo "lyrata done (LL)"
 ```
 
-The outputs from this step can be found at this link: (https://figshare.com/projects/Data_for_MDS_analyses/134765)[https://figshare.com/projects/Data_for_MDS_analyses/134765]
+The outputs from this step can be found at this [link](https://figshare.com/projects/Data_for_MDS_analyses/134765).
