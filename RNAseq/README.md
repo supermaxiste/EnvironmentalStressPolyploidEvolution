@@ -21,7 +21,7 @@ The naming of the folders reflects the execution order of the scripts:
 
 Please check and modify the paths at the beginning of each script to make sure that input files/folders, output folders and resources used are set appropriately.  
 
-To reproduce the analyses you need to have Conda installed (we recommend [miniconda](https://docs.conda.io/en/latest/miniconda.html) and create an environment using `rna_env.yaml` as follows:
+To reproduce the analyses you need to have Conda installed (we recommend [miniconda](https://docs.conda.io/en/latest/miniconda.html)) and create an environment using `rna_env.yaml` as follows:
 
 ```
 conda env create -f rna_env.yaml
