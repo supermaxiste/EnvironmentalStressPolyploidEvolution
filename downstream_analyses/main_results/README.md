@@ -44,7 +44,7 @@ Details: To find out how to obtain the data used, refer to the `METHImpute_analy
 ### Figure 4a
 
 Package requirements: `tidyverse`, `data.table` and `patchwork`  
-Script: `Fig4a_DMRBarplot.R`. 
+Script: `Fig4a_DMRBarplot.R`.  
 Data: `dmrseq` output from the ARPEGGIO pipeline, specifically synthetics generations 1 & 4 vs progenitors from generation 1 (both conditions):
   - [MILD_syn1_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_syn1_v_pro1)
   - [MILD_syn4_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_syn4_v_pro1)
@@ -55,7 +55,7 @@ Details: the script changes working directory 4 times, one for each of the outpu
 ### Figure 4b
 
 Package requirements: `grid`, `gridExtra`, `tidyverse`, `data.table`, `GenomicRanges` and `patchwork`  
-Script: `Fig4b_DonutPlot.R`. 
+Script: `Fig4b_DonutPlot.R`.  
 Data: 500bp promoter annotation files in `data/Fig4b`, classical genome annotation files from TBD and the same `drmseq` output data for `Fig4a`:  
   - [MILD_syn1_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_syn1_v_pro1)
   - [MILD_syn4_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_syn4_v_pro1)
@@ -67,7 +67,7 @@ Details: the script changes working directory 4 times, one for each of the outpu
 ### Figure 4c
 
 Package requirements: `tidyverse`, `data.table` and `patchwork`  
-Script: `Fig4c_DMRLineplot.R`. 
+Script: `Fig4c_DMRLineplot.R`.  
 Data: `dmrseq` output from the ARPEGGIO pipeline, specifically alk & tks generation 1 vs progenitors generation 1 and synthetics generation 1 & 4 (both conditions):
   - [MILD_alk1_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_alk1_v_pro1)
   - [MILD_alk1_v_syn1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_alk1_v_syn1)
