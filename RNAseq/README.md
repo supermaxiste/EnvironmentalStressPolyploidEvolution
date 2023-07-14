@@ -19,9 +19,21 @@ The naming of the folders reflects the execution order of the scripts:
   3) `read_sorting.sh` classifies polyploid reads with `EAGLE` (v1.1.3)
   4) `featureCounts.sh` creates count tables with featureCounts (part of `subread` v2.0.1)
 
-Please check and modify the paths at the beginning of each script to make sure that input files/folders, output folders and resources used are set appropriately.
+Please check and modify the paths at the beginning of each script to make sure that input files/folders, output folders and resources used are set appropriately.  
 
-Before executing the scripts make sure to activate the `conda` environment created using `rna_env.yaml`. For `read_sorting.sh` script you will need to install [EAGLE](https://github.com/tony-kuo/eagle) (v1.1.3) and set a path to the `eagle` binary (the `conda` environment is not needed). Once all is set, run scripts as follows:
+To reproduce the analyses you need to have Conda installed (we recommend [miniconda](https://docs.conda.io/en/latest/miniconda.html) and create an environment using `rna_env.yaml` as follows:
+
+```
+conda env create -f rna_env.yaml
+```
+
+Before executing the scripts make sure to activate the `conda` environment created above:
+
+```
+conda activate rna_env
+```
+
+For the `read_sorting.sh` script you will need to install [EAGLE](https://github.com/tony-kuo/eagle) (v1.1.3) and set a path to the `eagle` binary (the `conda` environment is not needed). Once all is set, run scripts as follows:
 
 ```
 sh script.sh
