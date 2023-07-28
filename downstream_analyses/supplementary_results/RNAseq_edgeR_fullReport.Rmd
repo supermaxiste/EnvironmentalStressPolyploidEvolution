@@ -1,0 +1,2741 @@
+---
+title: "Expression changes in early stages of polyploidy"
+author: "Stefan Milosavljevic"
+date: "28/07/2023"
+output:
+  html_document:
+    df_print: paged
+    toc: true
+---
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.align='center',
+                      fig.path = "RNAplots/",
+                      dev = c("png"),
+                      dpi=600)
+output_path <- c("~/OneDrive/PhD/Project/Chapter_3/Reports/RNAseqDEG_v2/")
+```
+
+## Background
+
+Here we're analyzing RNA-seq data coming from leaf tissue of several natural and synthetic _Arabidopsis kamchatica_ polyploids with its two progenitors: _A. halleri_  and _A. lyrata_ diploids. The data was quality checked with FastQC v0.11.8, aligned with STAR v2.7.3a, read sorted with EAGLE-RC v1.1.2 and read counts were extracted with featureCounts (subread v2.0.1).
+The differential expression analyses below will always show two analyses in parallel: one for the _halleri_ side and one for the _lyrata_ side. Besides the first section, all other sections will have the same structure:
+
+ - Filtering and effective library size: in this step we filter lowly expressed genes and scale the library sizes to make them more comparable.
+ - Data exploration: we will look at the relationship between samples with the leading biological coefficient of variation (BCV). This plot can be seen as an unsupervised clustering method where we're trying to see if there's any outlier. With the two dimensions we are able to spot what are the main separation criteria between samples.
+ - Estimating dispersion: calculating the dispersion is required to have a better estimate of the underlying distribution (negative binomial), meaning more accurate statistical testing in the following steps. The square root of the dispersion value is equal to the BCV and can give an idea of the variation among samples.
+ - Testing for differentially expressed (DE) genes: standard differential expression analysis where we also correct for multiple testing. A plot of the up- and down-regulated genes is shown together with the total amount of genes showing increase, decrease or no change in expression. An output file is also provided with a list of genes differentially expressed.
+
+```{r, echo=FALSE, message=FALSE}
+
+## Libraries
+library(edgeR)
+library(data.table)
+library(ggplot2)
+
+## Reading in files
+
+# import low coverage genes list
+
+HM_lowC_genes_hal <- read.table("~/data/FigS6-7/HM_lowC_genes_hal.txt", quote="\"", comment.char="")
+HM_lowC_genes_lyr <- read.table("~/data/FigS6-7/HM_lowC_genes_lyr.txt", quote="\"", comment.char="")
+
+LL_lowC_genes_hal <- read.table("~/data/FigS6-7/LL_lowC_genes_hal.txt", quote="\"", comment.char="")
+LL_lowC_genes_lyr <- read.table("~/data/FigS6-7/LL_lowC_genes_lyr.txt", quote="\"", comment.char="")
+
+# Create new column names to fix last column name
+colnames <- c("Geneid", "Chr", "Start", "End", "Strand", "Length", "Counts")
+
+# Reading all files
+
+# Path to count tables (featureCounts output)
+folder_path <- "~/path/to/count_tables/"
+
+# Read files, first cold conditions
+
+HM_hal_G1_1 <- fread(paste0(folder_path, "HM_hal_G1_1_counts.txt"), 
+                  col.names = colnames)
+HM_hal_G1_2 <- fread(paste0(folder_path, "HM_hal_G1_2_counts.txt"), 
+                  col.names = colnames)
+HM_hal_G1_3 <- fread(paste0(folder_path, "HM_hal_G1_3_counts.txt"), 
+                  col.names = colnames)
+HM_hal_G1_4 <- fread(paste0(folder_path, "HM_hal_G1_4_counts.txt"), 
+                  col.names = colnames)
+
+HM_hal_G4_1 <- fread(paste0(folder_path, "HM_hal_G4_1_counts.txt"), 
+                  col.names = colnames)
+HM_hal_G4_2 <- fread(paste0(folder_path, "HM_hal_G4_2_counts.txt"), 
+                  col.names = colnames)
+HM_hal_G4_3 <- fread(paste0(folder_path, "HM_hal_G4_3_counts.txt"), 
+                  col.names = colnames)
+
+HM_lyr_G1_1 <- fread(paste0(folder_path, "HM_lyr_G1_1_counts.txt"), 
+                  col.names = colnames)
+HM_lyr_G1_2 <- fread(paste0(folder_path, "HM_lyr_G1_2_counts.txt"), 
+                  col.names = colnames)
+HM_lyr_G1_3 <- fread(paste0(folder_path, "HM_lyr_G1_3_counts.txt"), 
+                  col.names = colnames)
+HM_lyr_G1_4 <- fread(paste0(folder_path, "HM_lyr_G1_4_counts.txt"), 
+                  col.names = colnames)
+
+HM_lyr_G4_1 <- fread(paste0(folder_path, "HM_lyr_G4_1_counts.txt"), 
+                  col.names = colnames)
+HM_lyr_G4_2 <- fread(paste0(folder_path, "HM_lyr_G4_2_counts.txt"), 
+                  col.names = colnames)
+HM_lyr_G4_3 <- fread(paste0(folder_path, "HM_lyr_G4_3_counts.txt"), 
+                  col.names = colnames)
+
+HM_RS7_G1_1_hal <- fread(paste0(folder_path, "HM_RS7_G1_1_halcounts.txt"), 
+                     col.names = colnames)
+HM_RS7_G1_1_lyr <- fread(paste0(folder_path, "HM_RS7_G1_1_lyrcounts.txt"), 
+                     col.names = colnames)
+HM_RS7_G1_2_hal <- fread(paste0(folder_path, "HM_RS7_G1_2_halcounts.txt"), 
+                     col.names = colnames)
+HM_RS7_G1_2_lyr <- fread(paste0(folder_path, "HM_RS7_G1_2_lyrcounts.txt"), 
+                     col.names = colnames)
+HM_RS7_G1_3_hal <- fread(paste0(folder_path, "HM_RS7_G1_3_halcounts.txt"), 
+                     col.names = colnames)
+HM_RS7_G1_3_lyr <- fread(paste0(folder_path, "HM_RS7_G1_3_lyrcounts.txt"), 
+                     col.names = colnames)
+HM_RS7_G1_4_hal <- fread(paste0(folder_path, "HM_RS7_G1_4_halcounts.txt"), 
+                     col.names = colnames)
+HM_RS7_G1_4_lyr <- fread(paste0(folder_path, "HM_RS7_G1_4_lyrcounts.txt"), 
+                     col.names = colnames)
+
+HM_RS7_G4_1_hal <- fread(paste0(folder_path, "HM_RS7_G4_1_halcounts.txt"), 
+                     col.names = colnames)
+HM_RS7_G4_1_lyr <- fread(paste0(folder_path, "HM_RS7_G4_1_lyrcounts.txt"), 
+                     col.names = colnames)
+HM_RS7_G4_2_hal <- fread(paste0(folder_path, "HM_RS7_G4_2_halcounts.txt"), 
+                     col.names = colnames)
+HM_RS7_G4_2_lyr <- fread(paste0(folder_path, "HM_RS7_G4_2_lyrcounts.txt"), 
+                     col.names = colnames)
+HM_RS7_G4_3_hal <- fread(paste0(folder_path, "HM_RS7_G4_3_halcounts.txt"), 
+                     col.names = colnames)
+HM_RS7_G4_3_lyr <- fread(paste0(folder_path, "HM_RS7_G4_3_lyrcounts.txt"), 
+                     col.names = colnames)
+
+HM_ALK_G1_1_hal <- fread(paste0(folder_path, "HM_ALK_G1_1_halcounts.txt"), 
+                     col.names = colnames)
+HM_ALK_G1_1_lyr <- fread(paste0(folder_path, "HM_ALK_G1_1_lyrcounts.txt"), 
+                     col.names = colnames)
+HM_ALK_G1_2_hal <- fread(paste0(folder_path, "HM_ALK_G1_2_halcounts.txt"), 
+                     col.names = colnames)
+HM_ALK_G1_2_lyr <- fread(paste0(folder_path, "HM_ALK_G1_2_lyrcounts.txt"), 
+                     col.names = colnames)
+HM_ALK_G1_3_hal <- fread(paste0(folder_path, "HM_ALK_G1_3_halcounts.txt"), 
+                     col.names = colnames)
+HM_ALK_G1_3_lyr <- fread(paste0(folder_path, "HM_ALK_G1_3_lyrcounts.txt"), 
+                     col.names = colnames)
+
+HM_ALK_G4_1_hal <- fread(paste0(folder_path, "HM_ALK_G4_1_halcounts.txt"), 
+                     col.names = colnames)
+HM_ALK_G4_1_lyr <- fread(paste0(folder_path, "HM_ALK_G4_1_lyrcounts.txt"), 
+                     col.names = colnames)
+HM_ALK_G4_2_hal <- fread(paste0(folder_path, "HM_ALK_G4_2_halcounts.txt"), 
+                     col.names = colnames)
+HM_ALK_G4_2_lyr <- fread(paste0(folder_path, "HM_ALK_G4_2_lyrcounts.txt"), 
+                     col.names = colnames)
+HM_ALK_G4_3_hal <- fread(paste0(folder_path, "HM_ALK_G4_3_halcounts.txt"), 
+                     col.names = colnames)
+HM_ALK_G4_3_lyr <- fread(paste0(folder_path, "HM_ALK_G4_3_lyrcounts.txt"), 
+                     col.names = colnames)
+
+HM_TKS_G1_1_hal <- fread(paste0(folder_path, "HM_TKS_G1_1_halcounts.txt"), 
+                     col.names = colnames)
+HM_TKS_G1_1_lyr <- fread(paste0(folder_path, "HM_TKS_G1_1_lyrcounts.txt"), 
+                     col.names = colnames)
+HM_TKS_G1_2_hal <- fread(paste0(folder_path, "HM_TKS_G1_2_halcounts.txt"), 
+                     col.names = colnames)
+HM_TKS_G1_2_lyr <- fread(paste0(folder_path, "HM_TKS_G1_2_lyrcounts.txt"), 
+                     col.names = colnames)
+HM_TKS_G1_3_hal <- fread(paste0(folder_path, "HM_TKS_G1_3_halcounts.txt"), 
+                     col.names = colnames)
+HM_TKS_G1_3_lyr <- fread(paste0(folder_path, "HM_TKS_G1_3_lyrcounts.txt"), 
+                     col.names = colnames)
+
+HM_TKS_G5_1_hal <- fread(paste0(folder_path, "HM_TKS_G5_1_halcounts.txt"), 
+                     col.names = colnames)
+HM_TKS_G5_1_lyr <- fread(paste0(folder_path, "HM_TKS_G5_1_lyrcounts.txt"), 
+                     col.names = colnames)
+HM_TKS_G5_2_hal <- fread(paste0(folder_path, "HM_TKS_G5_2_halcounts.txt"), 
+                     col.names = colnames)
+HM_TKS_G5_2_lyr <- fread(paste0(folder_path, "HM_TKS_G5_2_lyrcounts.txt"), 
+                     col.names = colnames)
+HM_TKS_G5_3_hal <- fread(paste0(folder_path, "HM_TKS_G5_3_halcounts.txt"), 
+                     col.names = colnames)
+HM_TKS_G5_3_lyr <- fread(paste0(folder_path, "HM_TKS_G5_3_lyrcounts.txt"), 
+                     col.names = colnames)
+
+# Read files, hot conditions
+
+LL_hal_G1_1 <- fread(paste0(folder_path, "LL_hal_G1_1_counts.txt"), 
+                  col.names = colnames)
+LL_hal_G1_2 <- fread(paste0(folder_path, "LL_hal_G1_2_counts.txt"), 
+                  col.names = colnames)
+LL_hal_G1_4 <- fread(paste0(folder_path, "LL_hal_G1_4_counts.txt"), 
+                  col.names = colnames)
+LL_hal_G1_5 <- fread(paste0(folder_path, "LL_hal_G1_5_counts.txt"), 
+                  col.names = colnames)
+LL_hal_G1_6 <- fread(paste0(folder_path, "LL_hal_G1_6_counts.txt"), 
+                  col.names = colnames)
+
+LL_hal_G4_1 <- fread(paste0(folder_path, "LL_hal_G4_1_counts.txt"), 
+                  col.names = colnames)
+LL_hal_G4_2 <- fread(paste0(folder_path, "LL_hal_G4_2_counts.txt"), 
+                  col.names = colnames)
+
+LL_lyr_G1_1 <- fread(paste0(folder_path, "LL_lyr_G1_1_counts.txt"), 
+                  col.names = colnames)
+LL_lyr_G1_2 <- fread(paste0(folder_path, "LL_lyr_G1_2_counts.txt"), 
+                  col.names = colnames)
+LL_lyr_G1_4 <- fread(paste0(folder_path, "LL_lyr_G1_4_counts.txt"), 
+                  col.names = colnames)
+LL_lyr_G1_5 <- fread(paste0(folder_path, "LL_lyr_G1_5_counts.txt"), 
+                  col.names = colnames)
+LL_lyr_G1_6 <- fread(paste0(folder_path, "LL_lyr_G1_6_counts.txt"), 
+                  col.names = colnames)
+
+LL_lyr_G4_1 <- fread(paste0(folder_path, "LL_lyr_G4_1_counts.txt"), 
+                  col.names = colnames)
+LL_lyr_G4_2 <- fread(paste0(folder_path, "LL_lyr_G4_2_counts.txt"), 
+                  col.names = colnames)
+LL_lyr_G4_3 <- fread(paste0(folder_path, "LL_lyr_G4_3_counts.txt"), 
+                  col.names = colnames)
+LL_lyr_G4_4 <- fread(paste0(folder_path, "LL_lyr_G4_4_counts.txt"), 
+                  col.names = colnames)
+LL_lyr_G4_5 <- fread(paste0(folder_path, "LL_lyr_G4_5_counts.txt"), 
+                  col.names = colnames)
+
+LL_RS7_G1_1_hal <- fread(paste0(folder_path, "LL_RS7_G1_1_halcounts.txt"), 
+                     col.names = colnames)
+LL_RS7_G1_1_lyr <- fread(paste0(folder_path, "LL_RS7_G1_1_lyrcounts.txt"), 
+                     col.names = colnames)
+LL_RS7_G1_2_hal <- fread(paste0(folder_path, "LL_RS7_G1_2_halcounts.txt"), 
+                     col.names = colnames)
+LL_RS7_G1_2_lyr <- fread(paste0(folder_path, "LL_RS7_G1_2_lyrcounts.txt"), 
+                     col.names = colnames)
+LL_RS7_G1_3_hal <- fread(paste0(folder_path, "LL_RS7_G1_3_halcounts.txt"), 
+                     col.names = colnames)
+LL_RS7_G1_3_lyr <- fread(paste0(folder_path, "LL_RS7_G1_3_lyrcounts.txt"), 
+                     col.names = colnames)
+LL_RS7_G1_4_hal <- fread(paste0(folder_path, "LL_RS7_G1_4_halcounts.txt"), 
+                     col.names = colnames)
+LL_RS7_G1_4_lyr <- fread(paste0(folder_path, "LL_RS7_G1_4_lyrcounts.txt"), 
+                     col.names = colnames)
+
+
+LL_RS7_G4_1_hal <- fread(paste0(folder_path, "LL_RS7_G4_1_halcounts.txt"), 
+                     col.names = colnames)
+LL_RS7_G4_1_lyr <- fread(paste0(folder_path, "LL_RS7_G4_1_lyrcounts.txt"), 
+                     col.names = colnames)
+LL_RS7_G4_2_hal <- fread(paste0(folder_path, "LL_RS7_G4_2_halcounts.txt"), 
+                     col.names = colnames)
+LL_RS7_G4_2_lyr <- fread(paste0(folder_path, "LL_RS7_G4_2_lyrcounts.txt"), 
+                     col.names = colnames)
+LL_RS7_G4_3_hal <- fread(paste0(folder_path, "LL_RS7_G4_3_halcounts.txt"), 
+                     col.names = colnames)
+LL_RS7_G4_3_lyr <- fread(paste0(folder_path, "LL_RS7_G4_3_lyrcounts.txt"), 
+                     col.names = colnames)
+
+LL_ALK_G1_1_hal <- fread(paste0(folder_path, "LL_ALK_G1_1_halcounts.txt"), 
+                     col.names = colnames)
+LL_ALK_G1_1_lyr <- fread(paste0(folder_path, "LL_ALK_G1_1_lyrcounts.txt"), 
+                     col.names = colnames)
+LL_ALK_G1_2_hal <- fread(paste0(folder_path, "LL_ALK_G1_2_halcounts.txt"), 
+                     col.names = colnames)
+LL_ALK_G1_2_lyr <- fread(paste0(folder_path, "LL_ALK_G1_2_lyrcounts.txt"), 
+                     col.names = colnames)
+LL_ALK_G1_3_hal <- fread(paste0(folder_path, "LL_ALK_G1_3_halcounts.txt"), 
+                     col.names = colnames)
+LL_ALK_G1_3_lyr <- fread(paste0(folder_path, "LL_ALK_G1_3_lyrcounts.txt"), 
+                     col.names = colnames)
+
+LL_ALK_G4_1_hal <- fread(paste0(folder_path, "LL_ALK_G4_1_halcounts.txt"), 
+                     col.names = colnames)
+LL_ALK_G4_1_lyr <- fread(paste0(folder_path, "LL_ALK_G4_1_lyrcounts.txt"), 
+                     col.names = colnames)
+LL_ALK_G4_2_hal <- fread(paste0(folder_path, "LL_ALK_G4_2_halcounts.txt"), 
+                     col.names = colnames)
+LL_ALK_G4_2_lyr <- fread(paste0(folder_path, "LL_ALK_G4_2_lyrcounts.txt"), 
+                     col.names = colnames)
+LL_ALK_G4_3_hal <- fread(paste0(folder_path, "LL_ALK_G4_3_halcounts.txt"), 
+                     col.names = colnames)
+LL_ALK_G4_3_lyr <- fread(paste0(folder_path, "LL_ALK_G4_3_lyrcounts.txt"), 
+                     col.names = colnames)
+
+LL_TKS_G1_1_hal <- fread(paste0(folder_path, "LL_TKS_G1_1_halcounts.txt"), 
+                     col.names = colnames)
+LL_TKS_G1_1_lyr <- fread(paste0(folder_path, "LL_TKS_G1_1_lyrcounts.txt"), 
+                     col.names = colnames)
+LL_TKS_G1_2_hal <- fread(paste0(folder_path, "LL_TKS_G1_2_halcounts.txt"), 
+                     col.names = colnames)
+LL_TKS_G1_2_lyr <- fread(paste0(folder_path, "LL_TKS_G1_2_lyrcounts.txt"), 
+                     col.names = colnames)
+LL_TKS_G1_3_hal <- fread(paste0(folder_path, "LL_TKS_G1_3_halcounts.txt"), 
+                     col.names = colnames)
+LL_TKS_G1_3_lyr <- fread(paste0(folder_path, "LL_TKS_G1_3_lyrcounts.txt"), 
+                     col.names = colnames)
+
+LL_TKS_G5_1_hal <- fread(paste0(folder_path, "LL_TKS_G5_1_halcounts.txt"), 
+                     col.names = colnames)
+LL_TKS_G5_1_lyr <- fread(paste0(folder_path, "LL_TKS_G5_1_lyrcounts.txt"), 
+                     col.names = colnames)
+LL_TKS_G5_2_hal <- fread(paste0(folder_path, "LL_TKS_G5_2_halcounts.txt"), 
+                     col.names = colnames)
+LL_TKS_G5_2_lyr <- fread(paste0(folder_path, "LL_TKS_G5_2_lyrcounts.txt"), 
+                     col.names = colnames)
+LL_TKS_G5_3_hal <- fread(paste0(folder_path, "LL_TKS_G5_3_halcounts.txt"), 
+                     col.names = colnames)
+LL_TKS_G5_3_lyr <- fread(paste0(folder_path, "LL_TKS_G5_3_lyrcounts.txt"), 
+                     col.names = colnames)
+
+
+# Creating a matrix of counts for edgeR
+counts_hal <- cbind(HM_hal_G1_1$Counts,
+                    HM_hal_G1_2$Counts,
+                    HM_hal_G1_3$Counts,
+                    HM_hal_G1_4$Counts,
+                    HM_hal_G4_1$Counts,
+                    HM_hal_G4_2$Counts,
+                    HM_hal_G4_3$Counts,
+                    HM_RS7_G1_1_hal$Counts,
+                    HM_RS7_G1_2_hal$Counts,
+                    HM_RS7_G1_3_hal$Counts,
+                    HM_RS7_G1_4_hal$Counts,
+                    HM_RS7_G4_1_hal$Counts,
+                    HM_RS7_G4_2_hal$Counts,
+                    HM_RS7_G4_3_hal$Counts,
+                    HM_ALK_G1_1_hal$Counts,
+                    HM_ALK_G1_2_hal$Counts,
+                    HM_ALK_G1_3_hal$Counts,
+                    HM_ALK_G4_1_hal$Counts,
+                    HM_ALK_G4_2_hal$Counts,
+                    HM_ALK_G4_3_hal$Counts,
+                    HM_TKS_G1_1_hal$Counts,
+                    HM_TKS_G1_2_hal$Counts,
+                    HM_TKS_G1_3_hal$Counts,
+                    HM_TKS_G5_1_hal$Counts,
+                    HM_TKS_G5_2_hal$Counts,
+                    HM_TKS_G5_3_hal$Counts,
+                    LL_hal_G1_1$Counts,
+                    LL_hal_G1_2$Counts,
+                    LL_hal_G1_4$Counts,
+                    LL_hal_G1_5$Counts,
+                    LL_hal_G1_6$Counts,
+                    LL_hal_G4_1$Counts,
+                    LL_hal_G4_2$Counts,
+                    LL_RS7_G1_1_hal$Counts,
+                    LL_RS7_G1_2_hal$Counts,
+                    LL_RS7_G1_3_hal$Counts,
+                    LL_RS7_G1_4_hal$Counts,
+                    LL_RS7_G4_1_hal$Counts,
+                    LL_RS7_G4_2_hal$Counts,
+                    LL_RS7_G4_3_hal$Counts,
+                    LL_ALK_G1_1_hal$Counts,
+                    LL_ALK_G1_2_hal$Counts,
+                    LL_ALK_G1_3_hal$Counts,
+                    LL_ALK_G4_1_hal$Counts,
+                    LL_ALK_G4_2_hal$Counts,
+                    LL_ALK_G4_3_hal$Counts,
+                    LL_TKS_G1_1_hal$Counts,
+                    LL_TKS_G1_2_hal$Counts,
+                    LL_TKS_G1_3_hal$Counts,
+                    LL_TKS_G5_1_hal$Counts,
+                    LL_TKS_G5_2_hal$Counts,
+                    LL_TKS_G5_3_hal$Counts)
+
+counts_lyr <- cbind(HM_lyr_G1_1$Counts,
+                    HM_lyr_G1_2$Counts,
+                    HM_lyr_G1_3$Counts,
+                    HM_lyr_G1_4$Counts,
+                    HM_lyr_G4_1$Counts,
+                    HM_lyr_G4_2$Counts,
+                    HM_lyr_G4_3$Counts,
+                    HM_RS7_G1_1_lyr$Counts,
+                    HM_RS7_G1_2_lyr$Counts,
+                    HM_RS7_G1_3_lyr$Counts,
+                    HM_RS7_G1_4_lyr$Counts,
+                    HM_RS7_G4_1_lyr$Counts,
+                    HM_RS7_G4_2_lyr$Counts,
+                    HM_RS7_G4_3_lyr$Counts,
+                    HM_ALK_G1_1_lyr$Counts,
+                    HM_ALK_G1_2_lyr$Counts,
+                    HM_ALK_G1_3_lyr$Counts,
+                    HM_ALK_G4_1_lyr$Counts,
+                    HM_ALK_G4_2_lyr$Counts,
+                    HM_ALK_G4_3_lyr$Counts,
+                    HM_TKS_G1_1_lyr$Counts,
+                    HM_TKS_G1_2_lyr$Counts,
+                    HM_TKS_G1_3_lyr$Counts,
+                    HM_TKS_G5_1_lyr$Counts,
+                    HM_TKS_G5_2_lyr$Counts,
+                    HM_TKS_G5_3_lyr$Counts,
+                    LL_lyr_G1_1$Counts,
+                    LL_lyr_G1_2$Counts,
+                    LL_lyr_G1_4$Counts,
+                    LL_lyr_G1_5$Counts,
+                    LL_lyr_G1_6$Counts,
+                    LL_lyr_G4_1$Counts,
+                    LL_lyr_G4_2$Counts,
+                    LL_lyr_G4_3$Counts,
+                    LL_lyr_G4_4$Counts,
+                    LL_lyr_G4_5$Counts,
+                    LL_RS7_G1_1_lyr$Counts,
+                    LL_RS7_G1_2_lyr$Counts,
+                    LL_RS7_G1_3_lyr$Counts,
+                    LL_RS7_G1_4_lyr$Counts,
+                    LL_RS7_G4_1_lyr$Counts,
+                    LL_RS7_G4_2_lyr$Counts,
+                    LL_RS7_G4_3_lyr$Counts,
+                    LL_ALK_G1_1_lyr$Counts,
+                    LL_ALK_G1_2_lyr$Counts,
+                    LL_ALK_G1_3_lyr$Counts,
+                    LL_ALK_G4_1_lyr$Counts,
+                    LL_ALK_G4_2_lyr$Counts,
+                    LL_ALK_G4_3_lyr$Counts,
+                    LL_TKS_G1_1_lyr$Counts,
+                    LL_TKS_G1_2_lyr$Counts,
+                    LL_TKS_G1_3_lyr$Counts,
+                    LL_TKS_G5_1_lyr$Counts,
+                    LL_TKS_G5_2_lyr$Counts,
+                    LL_TKS_G5_3_lyr$Counts)
+
+# Rename counts columns to name samples in the DGEList format 
+# (otherwise they will be named sample1,2,etc.)
+
+colnames(counts_hal) <- c("HM_hal_G1_1",
+                          "HM_hal_G1_2",
+                          "HM_hal_G1_3",
+                          "HM_hal_G1_4",
+                          "HM_hal_G4_1",
+                          "HM_hal_G4_2",
+                          "HM_hal_G4_3",
+                          "HM_RS7_G1_1_hal",
+                          "HM_RS7_G1_2_hal",
+                          "HM_RS7_G1_3_hal",
+                          "HM_RS7_G1_4_hal",
+                          "HM_RS7_G4_1_hal",
+                          "HM_RS7_G4_2_hal",
+                          "HM_RS7_G4_3_hal",
+                          "HM_ALK_G1_1_hal",
+                          "HM_ALK_G1_2_hal",
+                          "HM_ALK_G1_3_hal",
+                          "HM_ALK_G4_1_hal",
+                          "HM_ALK_G4_2_hal",
+                          "HM_ALK_G4_3_hal",
+                          "HM_TKS_G1_1_hal",
+                          "HM_TKS_G1_2_hal",
+                          "HM_TKS_G1_3_hal",
+                          "HM_TKS_G5_1_hal",
+                          "HM_TKS_G5_2_hal",
+                          "HM_TKS_G5_3_hal",
+                          "LL_hal_G1_1",
+                          "LL_hal_G1_2",
+                          "LL_hal_G1_4",
+                          "LL_hal_G1_5",
+                          "LL_hal_G1_6",
+                          "LL_hal_G4_1",
+                          "LL_hal_G4_2",
+                          "LL_RS7_G1_1_hal",
+                          "LL_RS7_G1_2_hal",
+                          "LL_RS7_G1_3_hal",
+                          "LL_RS7_G1_4_hal",
+                          "LL_RS7_G4_1_hal",
+                          "LL_RS7_G4_2_hal",
+                          "LL_RS7_G4_3_hal",
+                          "LL_ALK_G1_1_hal",
+                          "LL_ALK_G1_2_hal",
+                          "LL_ALK_G1_3_hal",
+                          "LL_ALK_G4_1_hal",
+                          "LL_ALK_G4_2_hal",
+                          "LL_ALK_G4_3_hal",
+                          "LL_TKS_G1_1_hal",
+                          "LL_TKS_G1_2_hal",
+                          "LL_TKS_G1_3_hal",
+                          "LL_TKS_G5_1_hal",
+                          "LL_TKS_G5_2_hal",
+                          "LL_TKS_G5_3_hal")
+
+colnames(counts_lyr) <- c("HM_lyr_G1_1",
+                          "HM_lyr_G1_2",
+                          "HM_lyr_G1_3",
+                          "HM_lyr_G1_4",
+                          "HM_lyr_G4_1",
+                          "HM_lyr_G4_2",
+                          "HM_lyr_G4_3",
+                          "HM_RS7_G1_1_lyr",
+                          "HM_RS7_G1_2_lyr",
+                          "HM_RS7_G1_3_lyr",
+                          "HM_RS7_G1_4_lyr",
+                          "HM_RS7_G4_1_lyr",
+                          "HM_RS7_G4_2_lyr",
+                          "HM_RS7_G4_3_lyr",
+                          "HM_ALK_G1_1_lyr",
+                          "HM_ALK_G1_2_lyr",
+                          "HM_ALK_G1_3_lyr",
+                          "HM_ALK_G4_1_lyr",
+                          "HM_ALK_G4_2_lyr",
+                          "HM_ALK_G4_3_lyr",
+                          "HM_TKS_G1_1_lyr",
+                          "HM_TKS_G1_2_lyr",
+                          "HM_TKS_G1_3_lyr",
+                          "HM_TKS_G5_1_lyr",
+                          "HM_TKS_G5_2_lyr",
+                          "HM_TKS_G5_3_lyr",
+                          "LL_lyr_G1_1",
+                          "LL_lyr_G1_2",
+                          "LL_lyr_G1_4",
+                          "LL_lyr_G1_5",
+                          "LL_lyr_G1_6",
+                          "LL_lyr_G4_1",
+                          "LL_lyr_G4_2",
+                          "LL_lyr_G4_4",
+                          "LL_lyr_G4_5",
+                          "LL_lyr_G4_6",
+                          "LL_RS7_G1_1_lyr",
+                          "LL_RS7_G1_2_lyr",
+                          "LL_RS7_G1_3_lyr",
+                          "LL_RS7_G1_4_lyr",
+                          "LL_RS7_G4_1_lyr",
+                          "LL_RS7_G4_2_lyr",
+                          "LL_RS7_G4_3_lyr",
+                          "LL_ALK_G1_1_lyr",
+                          "LL_ALK_G1_2_lyr",
+                          "LL_ALK_G1_3_lyr",
+                          "LL_ALK_G4_1_lyr",
+                          "LL_ALK_G4_2_lyr",
+                          "LL_ALK_G4_3_lyr",
+                          "LL_TKS_G1_1_lyr",
+                          "LL_TKS_G1_2_lyr",
+                          "LL_TKS_G1_3_lyr",
+                          "LL_TKS_G5_1_lyr",
+                          "LL_TKS_G5_2_lyr",
+                          "LL_TKS_G5_3_lyr")
+
+# Convert to DGEList format for further analyses
+
+y_hal <- DGEList(counts = counts_hal,
+             genes = HM_hal_G1_1$Geneid,
+             group = c("HM_hal_G1","HM_hal_G1","HM_hal_G1","HM_hal_G1",
+                       "HM_hal_G4","HM_hal_G4","HM_hal_G4",
+                       "HM_syn_G1","HM_syn_G1","HM_syn_G1","HM_syn_G1",
+                       "HM_syn_G4","HM_syn_G4","HM_syn_G4",
+                       "HM_ALK_G1","HM_ALK_G1","HM_ALK_G1",
+                       "HM_ALK_G4","HM_ALK_G4","HM_ALK_G4",
+                       "HM_TKS_G1","HM_TKS_G1","HM_TKS_G1",
+                       "HM_TKS_G5","HM_TKS_G5","HM_TKS_G5",
+                       "LL_hal_G1","LL_hal_G1","LL_hal_G1","LL_hal_G1","LL_hal_G1",
+                       "LL_hal_G4","LL_hal_G4",
+                       "LL_syn_G1","LL_syn_G1","LL_syn_G1","LL_syn_G1",
+                       "LL_syn_G4","LL_syn_G4","LL_syn_G4",
+                       "LL_ALK_G1","LL_ALK_G1","LL_ALK_G1",
+                       "LL_ALK_G4","LL_ALK_G4","LL_ALK_G4",
+                       "LL_TKS_G1","LL_TKS_G1","LL_TKS_G1",
+                       "LL_TKS_G5","LL_TKS_G5","LL_TKS_G5"))
+
+y_lyr <- DGEList(counts = counts_lyr,
+             genes = HM_lyr_G1_1$Geneid,
+             group = c("HM_lyr_G1","HM_lyr_G1","HM_lyr_G1","HM_lyr_G1",
+                       "HM_lyr_G4","HM_lyr_G4","HM_lyr_G4",
+                       "HM_syn_G1","HM_syn_G1","HM_syn_G1","HM_syn_G1",
+                       "HM_syn_G4","HM_syn_G4","HM_syn_G4",
+                       "HM_ALK_G1","HM_ALK_G1","HM_ALK_G1",
+                       "HM_ALK_G4","HM_ALK_G4","HM_ALK_G4",
+                       "HM_TKS_G1","HM_TKS_G1","HM_TKS_G1",
+                       "HM_TKS_G5","HM_TKS_G5","HM_TKS_G5",
+                       "LL_lyr_G1","LL_lyr_G1","LL_lyr_G1","LL_lyr_G1","LL_lyr_G1",
+                       "LL_lyr_G4","LL_lyr_G4","LL_lyr_G4","LL_lyr_G4","LL_lyr_G4",
+                       "LL_syn_G1","LL_syn_G1","LL_syn_G1","LL_syn_G1",
+                       "LL_syn_G4","LL_syn_G4","LL_syn_G4",
+                       "LL_ALK_G1","LL_ALK_G1","LL_ALK_G1",
+                       "LL_ALK_G4","LL_ALK_G4","LL_ALK_G4",
+                       "LL_TKS_G1","LL_TKS_G1","LL_TKS_G1",
+                       "LL_TKS_G5","LL_TKS_G5","LL_TKS_G5"))
+
+```
+
+## Overview (all samples)
+
+Here we will look at all the samples, their total read number and their relationship.
+This is the total read number of all the samples from the _halleri_ side:  
+
+
+```{r}
+y_hal$samples
+```
+
+This is the total read number of all the samples from the _lyrata_ side: 
+
+```{r}
+y_lyr$samples
+```
+
+
+### Filtering and effective library size
+
+```{r, echo=FALSE}
+## halleri side
+
+# Filter creation
+keep_hal <- filterByExpr(y_hal)
+
+# Show how many genes are filtered
+table(keep_hal)
+
+# Perform filtering
+y_hal <- y_hal[keep_hal, , keep.lib.sizes=FALSE]
+
+## lyrata side
+
+# Filter creation
+keep_lyr <- filterByExpr(y_lyr)
+
+# Show how many genes are filtered
+table(keep_lyr)
+
+# Perform filtering
+y_lyr <- y_lyr[keep_lyr, , keep.lib.sizes=FALSE]
+```
+
+For both _halleri_ and _lyrata_ less than half of all the genes are removed because of low expression.
+
+```{r}
+# Scaling library sizes 
+y_hal <- calcNormFactors(y_hal)
+y_lyr <- calcNormFactors(y_lyr)
+
+# Check scaling for halleri
+y_hal$samples
+
+# Check scaling for lyrata
+y_lyr$samples
+
+```
+
+### Data exploration
+
+First _halleri_ side:
+
+```{r, echo=FALSE}
+par(mar = c(5, 5, 4, 6))
+mdsHal <- plotMDS(y_hal, col=as.numeric(y_hal$samples$group), pch = 1, plot = F)
+dataMDS_hal <- data.frame(x = mdsHal$x, y = mdsHal$y,
+                          condition = c(rep("HM", 26),
+                                        rep("LL", 26)),
+                          generation = c(rep("G1", 4),
+                                         rep("G4", 3),
+                                         rep("G1", 4),
+                                         rep("G4", 3),
+                                         rep("G1", 3),
+                                         rep("G4", 3),
+                                         rep("G1", 3),
+                                         rep("G4", 3),
+                                         rep("G1", 5),
+                                         rep("G4", 2),
+                                         rep("G1", 4),
+                                         rep("G4", 3),
+                                         rep("G1", 3),
+                                         rep("G4", 3),
+                                         rep("G1", 3),
+                                         rep("G4", 3)),
+                          ploidy = c(rep("diploid", 7),
+                                     rep("polyploid", 19),
+                                     rep("diploid", 7),
+                                     rep("polyploid", 19)),
+                          samples = c(rep("HM_hal_G1", 4),
+                                      rep("HM_hal_G4", 3),
+                                      rep("HM_RS7_G1", 4),
+                                      rep("HM_RS7_G4", 3),
+                                      rep("HM_ALK_G1", 3),
+                                      rep("HM_ALK_G4", 3),
+                                      rep("HM_TKS_G1", 3),
+                                      rep("HM_TKS_G5", 3),
+                                      rep("LL_hal_G1", 5),
+                                      rep("LL_hal_G4", 2),
+                                      rep("LL_RS7_G1", 4),
+                                      rep("LL_RS7_G4", 3),
+                                      rep("LL_ALK_G1", 3),
+                                      rep("LL_ALK_G4", 3),
+                                      rep("LL_TKS_G1", 3),
+                                      rep("LL_TKS_G5", 3)),
+                          category = c(rep("progenitor", 7),
+                                       rep("synthetic", 7),
+                                       rep("natural", 12),
+                                       rep("progenitor", 7),
+                                       rep("synthetic", 7),
+                                       rep("natural", 12)))
+
+```
+
+#### BCV coloured by condition
+
+```{r BCV_all_hal_condition, echo=FALSE}
+ggplot(data = dataMDS_hal, aes(x = x, y = y, col = condition, label = samples)) +
+  geom_point() +
+  geom_text() +
+  theme_bw()
+
+```
+
+#### BCV coloured by generation
+
+```{r BCV_all_hal_generation, echo=FALSE}
+ggplot(data = dataMDS_hal, aes(x = x, y = y, col = generation, label = samples)) +
+  geom_point() +
+  geom_text() +
+  theme_bw()
+  
+```
+
+#### BCV coloured by ploidy
+
+```{r BCV_all_hal_ploidy, echo=FALSE}
+ggplot(data = dataMDS_hal, aes(x = x, y = y, col = ploidy, label = samples)) +
+  geom_point() +
+  geom_text() +
+  theme_bw()
+  
+```
+
+#### BCV coloured by samples
+
+```{r BCV_all_hal_samples, echo=FALSE}
+ggplot(data = dataMDS_hal, aes(x = x, y = y, col = samples)) +
+  geom_point() +
+  #geom_text() +
+  theme_bw()
+```  
+
+#### BCV coloured by category
+
+```{r BCV_all_hal_category, echo=FALSE}
+ggplot(data = dataMDS_hal, aes(x = x, y = y, col = category, shape = condition)) +
+  geom_point(size = 4) +
+  #geom_text() +
+  theme_bw() +
+  theme(
+    text=element_text(size=20)
+  )
+```  
+
+
+Then _lyrata_ side:
+
+```{r, echo=FALSE}
+mdsLyr <- plotMDS(y_lyr, col=as.numeric(y_lyr$samples$group), pch = 1, plot = F)
+dataMDS_lyr <- par(mar = c(5, 5, 4, 6))
+dataMDS_lyr <- data.frame(x = mdsLyr$x, y = mdsLyr$y,
+                          condition = c(rep("HM", 26),
+                                        rep("LL", 29)),
+                          generation = c(rep("G1", 4),
+                                         rep("G4", 3),
+                                         rep("G1", 4),
+                                         rep("G4", 3),
+                                         rep("G1", 3),
+                                         rep("G4", 3),
+                                         rep("G1", 3),
+                                         rep("G4", 3),
+                                         rep("G1", 5),
+                                         rep("G4", 5),
+                                         rep("G1", 4),
+                                         rep("G4", 3),
+                                         rep("G1", 3),
+                                         rep("G4", 3),
+                                         rep("G1", 3),
+                                         rep("G4", 3)),
+                          ploidy = c(rep("diploid", 7),
+                                     rep("polyploid", 19),
+                                     rep("diploid", 10),
+                                     rep("polyploid", 19)),
+                          samples = c(rep("HM_lyr_G1", 4),
+                                      rep("HM_lyr_G4", 3),
+                                      rep("HM_RS7_G1", 4),
+                                      rep("HM_RS7_G4", 3),
+                                      rep("HM_ALK_G1", 3),
+                                      rep("HM_ALK_G4", 3),
+                                      rep("HM_TKS_G1", 3),
+                                      rep("HM_TKS_G5", 3),
+                                      rep("LL_lyr_G1", 5),
+                                      rep("LL_lyr_G4", 5),
+                                      rep("LL_RS7_G1", 4),
+                                      rep("LL_RS7_G4", 3),
+                                      rep("LL_ALK_G1", 3),
+                                      rep("LL_ALK_G4", 3),
+                                      rep("LL_TKS_G1", 3),
+                                      rep("LL_TKS_G5", 3)),
+                          category = c(rep("progenitor", 7),
+                                       rep("synthetic", 7),
+                                       rep("natural", 12),
+                                       rep("progenitor", 10),
+                                       rep("synthetic", 7),
+                                       rep("natural", 12)))
+
+```
+
+#### BCV coloured by condition
+
+```{r BCV_all_lyr_condition, echo=FALSE}
+ggplot(data = dataMDS_lyr, aes(x = x, y = y, col = condition, label = samples)) +
+  geom_point() +
+  geom_text() +
+  theme_bw()
+
+```
+
+#### BCV coloured by generation
+
+```{r BCV_all_lyr_generation, echo=FALSE}
+ggplot(data = dataMDS_lyr, aes(x = x, y = y, col = generation, label = samples)) +
+  geom_point() +
+  geom_text() +
+  theme_bw()
+  
+```
+
+#### BCV coloured by ploidy
+
+```{r BCV_all_lyr_ploidy, echo=FALSE}
+ggplot(data = dataMDS_lyr, aes(x = x, y = y, col = ploidy, label = samples)) +
+  geom_point() +
+  geom_text() +
+  theme_bw()
+  
+```
+
+#### BCV coloured by samples
+
+```{r BCV_all_lyr_samples, echo=FALSE}
+ggplot(data = dataMDS_lyr, aes(x = x, y = y, col = samples)) +
+  geom_point() +
+  #geom_text() +
+  theme_bw()
+```  
+
+#### BCV coloured by category
+
+```{r BCV_all_lyr_categories, echo=FALSE}
+ggplot(data = dataMDS_lyr, aes(x = x, y = y, col = category, shape = condition)) +
+  geom_point(size = 4) +
+  #geom_text() +
+  theme_bw() +
+  theme(
+    text=element_text(size=20)
+    )
+```  
+
+
+```{r, echo=FALSE}
+y_hal <- estimateDisp(y_hal)
+y_lyr <- estimateDisp(y_lyr)
+```
+
+
+# High Mountain / Cold conditions
+
+## Progenitors G4 vs progenitors G1
+
+```{r DEplot_HM_halG1_v_G4, echo=FALSE}
+
+## halleri side 
+
+HM_hal_G1_v_G4 <- exactTest(y_hal, pair = c("HM_hal_G1", "HM_hal_G4"))
+
+plotMD(HM_hal_G1_v_G4, main = "HM_hal_G1 (ref) vs HM_hal_G4")
+summary(decideTests(HM_hal_G1_v_G4))
+```
+
+```{r DEplot_HM_lyrG1_v_G4, echo=FALSE}
+
+## lyrata side 
+
+HM_lyr_G1_v_G4 <- exactTest(y_lyr, pair = c("HM_lyr_G1", "HM_lyr_G4"))
+
+plotMD(HM_lyr_G1_v_G4, main = "HM_lyr_G1 (ref) vs HM_lyr_G4")
+#plotMD(HM_lyr_G1_v_G4, main = "HM_lyr_G1 (ref) vs HM_lyr_G4", adjust.method = "BH")
+summary(decideTests(HM_lyr_G1_v_G4))
+```
+
+```{r, echo=FALSE}
+
+
+#plotMD(HM_lyr_G1_v_G4, main = "HM_lyr_G1 (ref) vs HM_lyr_G4")
+plotMD(HM_lyr_G1_v_G4, main = "HM_lyr_G1 (ref) vs HM_lyr_G4", adjust.method = "BH")
+summary(decideTests(HM_lyr_G1_v_G4, adjust.method = "BH"))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = HM_hal_G1_v_G4$genes, 
+                          logFC = HM_hal_G1_v_G4$table$logFC,
+                          logCPM = HM_hal_G1_v_G4$table$logCPM, 
+                          PValue = HM_hal_G1_v_G4$table$PValue,
+                          dir = decideTests(HM_hal_G1_v_G4), 
+                          qvalue = p.adjust(HM_hal_G1_v_G4$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "HM_halG1_v_G4_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "HM_halG1_v_G4_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "HM_halG1_v_G4_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = HM_lyr_G1_v_G4$genes, 
+                          logFC = HM_lyr_G1_v_G4$table$logFC,
+                          logCPM = HM_lyr_G1_v_G4$table$logCPM, 
+                          PValue = HM_lyr_G1_v_G4$table$PValue,
+                          dir = decideTests(HM_lyr_G1_v_G4), 
+                          qvalue = p.adjust(HM_lyr_G1_v_G4$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "HM_lyrG1_v_G4_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "HM_lyrG1_v_G4_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "HM_lyrG1_v_G4_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ synthetics RS7 G1 vs progenitors G1
+
+
+```{r DEplot_HM_halG1_RS7G1, echo=FALSE}
+
+## halleri side 
+
+HM_RS7_G1_v_PRO_G1_hal <- exactTest(y_hal, pair = c("HM_hal_G1", "HM_syn_G1"))
+
+plotMD(HM_RS7_G1_v_PRO_G1_hal, main = "HM_hal_G1 (ref) vs HM_RS7_G1")
+summary(decideTests(HM_RS7_G1_v_PRO_G1_hal))
+```
+
+```{r DEplot_HM_halG1_RS7G1_filtered, echo=FALSE}
+
+## halleri side 
+
+HM_RS7_G1_v_PRO_G1_hal <- exactTest(y_hal, pair = c("HM_hal_G1", "HM_syn_G1"))
+
+HM_RS7_G1_v_PRO_G1_hal_filtered <- HM_RS7_G1_v_PRO_G1_hal[!(HM_RS7_G1_v_PRO_G1_hal$genes$genes %in% HM_lowC_genes_hal$V1),]
+
+plotMD(HM_RS7_G1_v_PRO_G1_hal_filtered, main = "HM_hal_G1 (ref) vs HM_RS7_G1")
+summary(decideTests(HM_RS7_G1_v_PRO_G1_hal_filtered))
+```
+
+```{r DEplot_HM_lyrG1_RS7G1, echo=FALSE}
+
+## lyrata side 
+
+HM_RS7_G1_v_PRO_G1_lyr <- exactTest(y_lyr, pair = c("HM_lyr_G1", "HM_syn_G1"))
+
+plotMD(HM_RS7_G1_v_PRO_G1_lyr, main = "HM_lyr_G1 (ref) vs HM_RS7_G1")
+summary(decideTests(HM_RS7_G1_v_PRO_G1_lyr))
+```
+
+```{r DEplot_HM_lyrG1_RS7G1_filtered, echo=FALSE}
+
+## lyrata side 
+
+HM_RS7_G1_v_PRO_G1_lyr <- exactTest(y_lyr, pair = c("HM_lyr_G1", "HM_syn_G1"))
+
+HM_RS7_G1_v_PRO_G1_lyr_filtered <- HM_RS7_G1_v_PRO_G1_lyr[!(HM_RS7_G1_v_PRO_G1_lyr$genes$genes %in% HM_lowC_genes_lyr$V1),]
+
+plotMD(HM_RS7_G1_v_PRO_G1_lyr_filtered, main = "HM_lyr_G1 (ref) vs HM_RS7_G1")
+summary(decideTests(HM_RS7_G1_v_PRO_G1_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = HM_RS7_G1_v_PRO_G1_hal_filtered$genes, 
+                          logFC = HM_RS7_G1_v_PRO_G1_hal_filtered$table$logFC,
+                          logCPM = HM_RS7_G1_v_PRO_G1_hal_filtered$table$logCPM, 
+                          PValue = HM_RS7_G1_v_PRO_G1_hal_filtered$table$PValue,
+                          dir = decideTests(HM_RS7_G1_v_PRO_G1_hal_filtered), 
+                          qvalue = p.adjust(HM_RS7_G1_v_PRO_G1_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "HM_halG1_v_RS7G1_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "HM_halG1_v_RS7G1_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "HM_halG1_v_RS7G1_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = HM_RS7_G1_v_PRO_G1_lyr_filtered$genes, 
+                          logFC = HM_RS7_G1_v_PRO_G1_lyr_filtered$table$logFC,
+                          logCPM = HM_RS7_G1_v_PRO_G1_lyr_filtered$table$logCPM, 
+                          PValue = HM_RS7_G1_v_PRO_G1_lyr_filtered$table$PValue,
+                          dir = decideTests(HM_RS7_G1_v_PRO_G1_lyr_filtered), 
+                          qvalue = p.adjust(HM_RS7_G1_v_PRO_G1_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "HM_lyrG1_v_RS7G1_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "HM_lyrG1_v_RS7G1_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "HM_lyrG1_v_RS7G1_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ synthetics RS7 G4 vs progenitors G1
+
+```{r DEplot_HM_halG1_RS7G4, echo=FALSE}
+
+## halleri side
+
+HM_RS7_G4_v_PRO_G1_hal <- exactTest(y_hal, pair = c("HM_hal_G1", "HM_syn_G4"))
+
+plotMD(HM_RS7_G4_v_PRO_G1_hal, main = "HM_hal_G1 (ref) vs HM_RS7_G4")
+summary(decideTests(HM_RS7_G4_v_PRO_G1_hal))
+```
+
+```{r DEplot_HM_halG1_RS7G4_filtered, echo=FALSE}
+
+## halleri side 
+
+HM_RS7_G4_v_PRO_G1_hal <- exactTest(y_hal, pair = c("HM_hal_G1", "HM_syn_G4"))
+
+HM_RS7_G4_v_PRO_G1_hal_filtered <- HM_RS7_G4_v_PRO_G1_hal[!(HM_RS7_G4_v_PRO_G1_hal$genes$genes %in% HM_lowC_genes_hal$V1),]
+
+plotMD(HM_RS7_G4_v_PRO_G1_hal_filtered, main = "HM_hal_G1 (ref) vs HM_RS7_G4")
+summary(decideTests(HM_RS7_G4_v_PRO_G1_hal_filtered))
+```
+
+```{r DEplot_HM_lyrG1_RS7G4, echo=FALSE}
+
+## lyrata side 
+
+HM_RS7_G4_v_PRO_G1_lyr <- exactTest(y_lyr, pair = c("HM_lyr_G1", "HM_syn_G4"))
+
+plotMD(HM_RS7_G4_v_PRO_G1_lyr, main = "HM_lyr_G1 (ref) vs HM_RS7_G4")
+summary(decideTests(HM_RS7_G4_v_PRO_G1_lyr))
+```
+
+```{r DEplot_HM_lyrG1_RS7G4_filtered, echo=FALSE}
+
+## lyrata side 
+
+HM_RS7_G4_v_PRO_G1_lyr <- exactTest(y_lyr, pair = c("HM_lyr_G1", "HM_syn_G4"))
+
+HM_RS7_G4_v_PRO_G1_lyr_filtered <- HM_RS7_G4_v_PRO_G1_lyr[!(HM_RS7_G4_v_PRO_G1_lyr$genes$genes %in% HM_lowC_genes_lyr$V1),]
+
+plotMD(HM_RS7_G4_v_PRO_G1_lyr_filtered, main = "HM_lyr_G1 (ref) vs HM_RS7_G4")
+summary(decideTests(HM_RS7_G4_v_PRO_G1_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = HM_RS7_G4_v_PRO_G1_hal_filtered$genes, 
+                          logFC = HM_RS7_G4_v_PRO_G1_hal_filtered$table$logFC,
+                          logCPM = HM_RS7_G4_v_PRO_G1_hal_filtered$table$logCPM, 
+                          PValue = HM_RS7_G4_v_PRO_G1_hal_filtered$table$PValue,
+                          dir = decideTests(HM_RS7_G4_v_PRO_G1_hal_filtered), 
+                          qvalue = p.adjust(HM_RS7_G4_v_PRO_G1_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "HM_halG1_v_RS7G4_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "HM_halG1_v_RS7G4_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "HM_halG1_v_RS7G4_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = HM_RS7_G4_v_PRO_G1_lyr_filtered$genes, 
+                          logFC = HM_RS7_G4_v_PRO_G1_lyr_filtered$table$logFC,
+                          logCPM = HM_RS7_G4_v_PRO_G1_lyr_filtered$table$logCPM, 
+                          PValue = HM_RS7_G4_v_PRO_G1_lyr_filtered$table$PValue,
+                          dir = decideTests(HM_RS7_G4_v_PRO_G1_lyr_filtered), 
+                          qvalue = p.adjust(HM_RS7_G4_v_PRO_G1_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "HM_lyrG1_v_RS7G4_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "HM_lyrG1_v_RS7G4_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "HM_lyrG1_v_RS7G4_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ synthetics RS7 G4 vs _A. kamchatica_ synthetics RS7 G1
+
+
+```{r DEplot_HM_RS7G4_RS7G1_hal, echo=FALSE}
+
+## halleri side 
+
+HM_RS7_G4_v_G1_hal <- exactTest(y_hal, pair = c("HM_syn_G1", "HM_syn_G4"))
+
+plotMD(HM_RS7_G4_v_G1_hal, main = "HM_RS7_G1 (ref) vs HM_RS7_G4 - halleri side")
+summary(decideTests(HM_RS7_G4_v_G1_hal))
+```
+
+```{r DEplot_HM_RS7G4_RS7G1_hal_filtered, echo=FALSE}
+
+## halleri side 
+
+HM_RS7_G4_v_G1_hal <- exactTest(y_hal, pair = c("HM_syn_G1", "HM_syn_G4"))
+
+HM_RS7_G4_v_G1_hal_filtered <- HM_RS7_G4_v_G1_hal[!(HM_RS7_G4_v_G1_hal$genes$genes %in% HM_lowC_genes_hal$V1),]
+
+plotMD(HM_RS7_G4_v_G1_hal_filtered, main = "HM_RS7_G1 (ref) vs HM_RS7_G4 - halleri side")
+summary(decideTests(HM_RS7_G4_v_G1_hal_filtered))
+```
+
+```{r DEplot_HM_RS7G4_RS7G1_lyr, echo=FALSE}
+
+## lyrata side 
+
+HM_RS7_G4_v_G1_lyr <- exactTest(y_lyr, pair = c("HM_syn_G1", "HM_syn_G4"))
+
+plotMD(HM_RS7_G4_v_G1_lyr, main = "HM_RS7_G1 (ref) vs HM_RS7_G4 - lyrata side")
+summary(decideTests(HM_RS7_G4_v_G1_lyr))
+```
+
+```{r DEplot_HM_RS7G4_RS7G1_lyr_filtered, echo=FALSE}
+
+## lyrata side 
+
+HM_RS7_G4_v_G1_lyr <- exactTest(y_lyr, pair = c("HM_syn_G1", "HM_syn_G4"))
+
+HM_RS7_G4_v_G1_lyr_filtered <- HM_RS7_G4_v_G1_lyr[!(HM_RS7_G4_v_G1_lyr$genes$genes %in% HM_lowC_genes_lyr$V1),]
+
+plotMD(HM_RS7_G4_v_G1_lyr_filtered, main = "HM_RS7_G1 (ref) vs HM_RS7_G4 - lyrata side")
+summary(decideTests(HM_RS7_G4_v_G1_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = HM_RS7_G4_v_G1_hal_filtered$genes, 
+                          logFC = HM_RS7_G4_v_G1_hal_filtered$table$logFC,
+                          logCPM = HM_RS7_G4_v_G1_hal_filtered$table$logCPM, 
+                          PValue = HM_RS7_G4_v_G1_hal_filtered$table$PValue,
+                          dir = decideTests(HM_RS7_G4_v_G1_hal_filtered), 
+                          qvalue = p.adjust(HM_RS7_G4_v_G1_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "HM_RS7G1_v_G4_hal_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "HM_RS7G1_v_G4_hal_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "HM_RS7G1_v_G4_hal_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = HM_RS7_G4_v_G1_lyr_filtered$genes, 
+                          logFC = HM_RS7_G4_v_G1_lyr_filtered$table$logFC,
+                          logCPM = HM_RS7_G4_v_G1_lyr_filtered$table$logCPM, 
+                          PValue = HM_RS7_G4_v_G1_lyr_filtered$table$PValue,
+                          dir = decideTests(HM_RS7_G4_v_G1_lyr_filtered), 
+                          qvalue = p.adjust(HM_RS7_G4_v_G1_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "HM_RS7G1_v_G4_lyr_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "HM_RS7G1_v_G4_lyr_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "HM_RS7G1_v_G4_lyr_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ natural (ALK) G1 vs progenitors G1
+
+
+```{r DEplot_HM_ALKG1_PROG1_hal, echo=FALSE}
+
+## halleri side 
+
+HM_ALK_G1_v_PRO_G1_hal <- exactTest(y_hal, pair = c("HM_ALK_G1", "HM_hal_G1"))
+
+plotMD(HM_ALK_G1_v_PRO_G1_hal, main = "HM_ALK_G1 (ref) vs HM_hal_G1")
+summary(decideTests(HM_ALK_G1_v_PRO_G1_hal))
+```
+
+```{r DEplot_HM_ALK_G1_v_PRO_G1_hal_filtered, echo=FALSE}
+
+## halleri side 
+
+HM_ALK_G1_v_PRO_G1_hal <- exactTest(y_hal, pair = c("HM_ALK_G1", "HM_hal_G1"))
+
+HM_ALK_G1_v_PRO_G1_hal_filtered <- HM_ALK_G1_v_PRO_G1_hal[!(HM_ALK_G1_v_PRO_G1_hal$genes$genes %in% HM_lowC_genes_hal$V1),]
+
+plotMD(HM_ALK_G1_v_PRO_G1_hal_filtered, main = "HM_ALK_G1 (ref) vs HM_hal_G1")
+summary(decideTests(HM_ALK_G1_v_PRO_G1_hal_filtered))
+```
+
+```{r DEplot_HM_ALKG1_PROG1_lyr, echo=FALSE}
+
+## lyrata side 
+
+HM_ALK_G1_v_PRO_G1_lyr <- exactTest(y_lyr, pair = c("HM_ALK_G1", "HM_lyr_G1"))
+
+plotMD(HM_ALK_G1_v_PRO_G1_lyr, main = "HM_ALK_G1 (ref) vs HM_lyr_G1")
+summary(decideTests(HM_ALK_G1_v_PRO_G1_lyr))
+```
+
+```{r DEplot_HM_ALK_G1_v_PRO_G1_lyr_filtered, echo=FALSE}
+
+## lyrata side 
+
+HM_ALK_G1_v_PRO_G1_lyr <- exactTest(y_lyr, pair = c("HM_ALK_G1", "HM_lyr_G1"))
+
+HM_ALK_G1_v_PRO_G1_lyr_filtered <- HM_ALK_G1_v_PRO_G1_lyr[!(HM_ALK_G1_v_PRO_G1_lyr$genes$genes %in% HM_lowC_genes_lyr$V1),]
+
+plotMD(HM_ALK_G1_v_PRO_G1_lyr_filtered, main = "HM_ALK_G1 (ref) vs HM_lyr_G1")
+summary(decideTests(HM_ALK_G1_v_PRO_G1_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = HM_ALK_G1_v_PRO_G1_hal_filtered$genes, 
+                          logFC = HM_ALK_G1_v_PRO_G1_hal_filtered$table$logFC,
+                          logCPM = HM_ALK_G1_v_PRO_G1_hal_filtered$table$logCPM, 
+                          PValue = HM_ALK_G1_v_PRO_G1_hal_filtered$table$PValue,
+                          dir = decideTests(HM_ALK_G1_v_PRO_G1_hal_filtered), 
+                          qvalue = p.adjust(HM_ALK_G1_v_PRO_G1_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "HM_ALKG1_v_halG1_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "HM_ALKG1_v_halG1_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "HM_ALKG1_v_halG1_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = HM_ALK_G1_v_PRO_G1_lyr_filtered$genes, 
+                          logFC = HM_ALK_G1_v_PRO_G1_lyr_filtered$table$logFC,
+                          logCPM = HM_ALK_G1_v_PRO_G1_lyr_filtered$table$logCPM, 
+                          PValue = HM_ALK_G1_v_PRO_G1_lyr_filtered$table$PValue,
+                          dir = decideTests(HM_ALK_G1_v_PRO_G1_lyr_filtered), 
+                          qvalue = p.adjust(HM_ALK_G1_v_PRO_G1_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "HM_ALKG1_v_lyrG1_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "HM_ALKG1_v_lyrG1_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "HM_ALKG1_v_lyrG1_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ natural (ALK) G1 vs _A. kamchatica_ synthetics G1
+
+
+```{r DEplot_HM_ALKG1_SYNG1_hal, echo=FALSE}
+
+## halleri side 
+
+HM_ALK_G1_v_SYN_G1_hal <- exactTest(y_hal, pair = c("HM_ALK_G1", "HM_syn_G1"))
+
+plotMD(HM_ALK_G1_v_SYN_G1_hal, main = "HM_ALK_G1 (ref) vs HM_syn_G1")
+summary(decideTests(HM_ALK_G1_v_SYN_G1_hal))
+```
+
+```{r DEplot_HM_ALKG1_SYNG1_hal_filtered, echo=FALSE}
+
+## halleri side 
+
+HM_ALK_G1_v_SYN_G1_hal_filtered <- HM_ALK_G1_v_SYN_G1_hal[!(HM_ALK_G1_v_SYN_G1_hal$genes$genes %in% HM_lowC_genes_hal$V1),]
+
+plotMD(HM_ALK_G1_v_SYN_G1_hal_filtered, main = "HM_ALK_G1 (ref) vs HM_syn_G1")
+summary(decideTests(HM_ALK_G1_v_SYN_G1_hal_filtered))
+```
+
+```{r DEplot_HM_ALKG1_SYNG1_lyr, echo=FALSE}
+
+## lyrata side 
+
+HM_ALK_G1_v_SYN_G1_lyr <- exactTest(y_lyr, pair = c("HM_ALK_G1", "HM_syn_G1"))
+
+plotMD(HM_ALK_G1_v_SYN_G1_lyr, main = "HM_ALK_G1 (ref) vs HM_syn_G1")
+summary(decideTests(HM_ALK_G1_v_SYN_G1_lyr))
+```
+
+```{r DEplot_HM_ALKG1_SYNG1_lyr_filtered, echo=FALSE}
+
+## lyrata side 
+
+HM_ALK_G1_v_SYN_G1_lyr_filtered <- HM_ALK_G1_v_SYN_G1_lyr[!(HM_ALK_G1_v_SYN_G1_lyr$genes$genes %in% HM_lowC_genes_lyr$V1),]
+
+plotMD(HM_ALK_G1_v_SYN_G1_lyr_filtered, main = "HM_ALK_G1 (ref) vs HM_syn_G1")
+summary(decideTests(HM_ALK_G1_v_SYN_G1_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = HM_ALK_G1_v_SYN_G1_hal_filtered$genes, 
+                          logFC = HM_ALK_G1_v_SYN_G1_hal_filtered$table$logFC,
+                          logCPM = HM_ALK_G1_v_SYN_G1_hal_filtered$table$logCPM, 
+                          PValue = HM_ALK_G1_v_SYN_G1_hal_filtered$table$PValue,
+                          dir = decideTests(HM_ALK_G1_v_SYN_G1_hal_filtered), 
+                          qvalue = p.adjust(HM_ALK_G1_v_SYN_G1_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "HM_ALKG1_v_RS7G1_hal_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "HM_ALKG1_v_RS7G1_hal_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "HM_ALKG1_v_RS7G1_hal_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = HM_ALK_G1_v_SYN_G1_lyr_filtered$genes, 
+                          logFC = HM_ALK_G1_v_SYN_G1_lyr_filtered$table$logFC,
+                          logCPM = HM_ALK_G1_v_SYN_G1_lyr_filtered$table$logCPM, 
+                          PValue = HM_ALK_G1_v_SYN_G1_lyr_filtered$table$PValue,
+                          dir = decideTests(HM_ALK_G1_v_SYN_G1_lyr_filtered), 
+                          qvalue = p.adjust(HM_ALK_G1_v_SYN_G1_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "HM_ALKG1_v_RS7G1_lyr_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "HM_ALKG1_v_RS7G1_lyr_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "HM_ALKG1_v_RS7G1_lyr_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ natural (ALK) G1 vs _A. kamchatica_ synthetics G4
+
+
+```{r DEplot_HM_ALKG1_SYNG4_hal, echo=FALSE}
+
+## halleri side 
+
+HM_ALK_G1_v_SYN_G4_hal <- exactTest(y_hal, pair = c("HM_ALK_G1", "HM_syn_G4"))
+
+plotMD(HM_ALK_G1_v_SYN_G4_hal, main = "HM_ALK_G1 (ref) vs HM_syn_G4")
+summary(decideTests(HM_ALK_G1_v_SYN_G4_hal))
+```
+
+```{r DEplot_HM_ALKG1_SYNG4_hal_filtered, echo=FALSE}
+
+## halleri side 
+
+HM_ALK_G1_v_SYN_G4_hal <- exactTest(y_hal, pair = c("HM_ALK_G4", "HM_syn_G4"))
+
+HM_ALK_G1_v_SYN_G4_hal_filtered <- HM_ALK_G1_v_SYN_G4_hal[!(HM_ALK_G1_v_SYN_G4_hal$genes$genes %in% HM_lowC_genes_hal$V1),]
+
+plotMD(HM_ALK_G1_v_SYN_G4_hal_filtered, main = "HM_ALK_G1 (ref) vs HM_syn_G4")
+summary(decideTests(HM_ALK_G1_v_SYN_G4_hal_filtered))
+```
+
+```{r DEplot_HM_ALKG1_SYNG4_lyr, echo=FALSE}
+
+## lyrata side 
+
+HM_ALK_G1_v_SYN_G4_lyr <- exactTest(y_lyr, pair = c("HM_ALK_G1", "HM_syn_G4"))
+
+plotMD(HM_ALK_G1_v_SYN_G4_lyr, main = "HM_ALK_G1 (ref) vs HM_syn_G4")
+summary(decideTests(HM_ALK_G1_v_SYN_G4_lyr))
+```
+
+```{r DEplot_HM_ALKG1_SYNG4_lyr_filtered, echo=FALSE}
+
+## lyrata side 
+
+HM_ALK_G1_v_SYN_G4_lyr <- exactTest(y_lyr, pair = c("HM_ALK_G4", "HM_syn_G4"))
+
+HM_ALK_G1_v_SYN_G4_lyr_filtered <- HM_ALK_G1_v_SYN_G4_lyr[!(HM_ALK_G1_v_SYN_G4_lyr$genes$genes %in% HM_lowC_genes_lyr$V1),]
+
+plotMD(HM_ALK_G1_v_SYN_G4_lyr_filtered, main = "HM_ALK_G1 (ref) vs HM_syn_G4")
+summary(decideTests(HM_ALK_G1_v_SYN_G4_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = HM_ALK_G1_v_SYN_G4_hal_filtered$genes, 
+                          logFC = HM_ALK_G1_v_SYN_G4_hal_filtered$table$logFC,
+                          logCPM = HM_ALK_G1_v_SYN_G4_hal_filtered$table$logCPM, 
+                          PValue = HM_ALK_G1_v_SYN_G4_hal_filtered$table$PValue,
+                          dir = decideTests(HM_ALK_G1_v_SYN_G4_hal_filtered), 
+                          qvalue = p.adjust(HM_ALK_G1_v_SYN_G4_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "HM_ALKG1_v_RS7G4_hal_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "HM_ALKG1_v_RS7G4_hal_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "HM_ALKG1_v_RS7G4_hal_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = HM_ALK_G1_v_SYN_G4_lyr_filtered$genes, 
+                          logFC = HM_ALK_G1_v_SYN_G4_lyr_filtered$table$logFC,
+                          logCPM = HM_ALK_G1_v_SYN_G4_lyr_filtered$table$logCPM, 
+                          PValue = HM_ALK_G1_v_SYN_G4_lyr_filtered$table$PValue,
+                          dir = decideTests(HM_ALK_G1_v_SYN_G4_lyr_filtered), 
+                          qvalue = p.adjust(HM_ALK_G1_v_SYN_G4_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "HM_ALKG1_v_RS7G4_lyr_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "HM_ALKG1_v_RS7G4_lyr_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "HM_ALKG1_v_RS7G4_lyr_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ natural (ALK) G1 vs _A. kamchatica_ natural (ALK) G4
+
+
+```{r DEplot_HM_ALKG1_v_G4_hal, echo=FALSE}
+
+## halleri side 
+
+HM_ALK_G4_v_G1_hal <- exactTest(y_hal, pair = c("HM_ALK_G1", "HM_ALK_G4"))
+
+plotMD(HM_ALK_G4_v_G1_hal, main = "HM_ALK_G1 (ref) vs HM_ALK_G4 - halleri side")
+summary(decideTests(HM_ALK_G4_v_G1_hal))
+```
+
+```{r DEplot_HM_ALKG1_v_G4_lyr, echo=FALSE}
+
+## lyrata side 
+
+HM_ALK_G4_v_G1_lyr <- exactTest(y_lyr, pair = c("HM_ALK_G1", "HM_ALK_G4"))
+
+plotMD(HM_ALK_G4_v_G1_lyr, main = "HM_ALK_G1 (ref) vs HM_ALK_G4 - lyrata side")
+summary(decideTests(HM_ALK_G4_v_G1_lyr))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = HM_ALK_G4_v_G1_hal$genes, 
+                          logFC = HM_ALK_G4_v_G1_hal$table$logFC,
+                          logCPM = HM_ALK_G4_v_G1_hal$table$logCPM, 
+                          PValue = HM_ALK_G4_v_G1_hal$table$PValue,
+                          dir = decideTests(HM_ALK_G4_v_G1_hal), 
+                          qvalue = p.adjust(HM_ALK_G4_v_G1_hal$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "HM_ALKG1_v_G4_hal_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "HM_ALKG1_v_G4_hal_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "HM_ALKG1_v_G4_hal_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = HM_ALK_G4_v_G1_lyr$genes, 
+                          logFC = HM_ALK_G4_v_G1_lyr$table$logFC,
+                          logCPM = HM_ALK_G4_v_G1_lyr$table$logCPM, 
+                          PValue = HM_ALK_G4_v_G1_lyr$table$PValue,
+                          dir = decideTests(HM_ALK_G4_v_G1_lyr), 
+                          qvalue = p.adjust(HM_ALK_G4_v_G1_lyr$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "HM_ALKG1_v_G4_lyr_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "HM_ALKG1_v_G4_lyr_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "HM_ALKG1_v_G4_lyr_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+
+## _A. kamchatica_ natural (TKS) G1 vs progenitors G1
+
+
+```{r DEplot_HM_TKSG1_PROG1_hal, echo=FALSE}
+
+## halleri side 
+
+HM_TKS_G1_v_PRO_G1_hal <- exactTest(y_hal, pair = c("HM_TKS_G1", "HM_hal_G1"))
+
+## reverse logFC to have TKS as reference
+
+HM_TKS_G1_v_PRO_G1_hal$table$logFC <- -HM_TKS_G1_v_PRO_G1_hal$table$logFC
+
+plotMD(HM_TKS_G1_v_PRO_G1_hal, main = "HM_TKS_G1 (ref) vs HM_hal_G1")
+summary(decideTests(HM_TKS_G1_v_PRO_G1_hal))
+```
+
+```{r DEplot_HM_TKS_G1_v_PRO_G1_hal_filtered, echo=FALSE}
+
+## halleri side 
+
+HM_TKS_G1_v_PRO_G1_hal_filtered <- HM_TKS_G1_v_PRO_G1_hal[!(HM_TKS_G1_v_PRO_G1_hal$genes$genes %in% HM_lowC_genes_hal$V1),]
+
+plotMD(HM_TKS_G1_v_PRO_G1_hal_filtered, main = "HM_TKS_G1 (ref) vs HM_hal_G1")
+summary(decideTests(HM_TKS_G1_v_PRO_G1_hal_filtered))
+```
+
+```{r DEplot_HM_TKSG1_PROG1_lyr, echo=FALSE}
+
+## lyrata side 
+
+HM_TKS_G1_v_PRO_G1_lyr <- exactTest(y_lyr, pair = c("HM_TKS_G1", "HM_lyr_G1"))
+
+## reverse logFC to have TKS as reference
+
+HM_TKS_G1_v_PRO_G1_lyr$table$logFC <- -HM_TKS_G1_v_PRO_G1_lyr$table$logFC
+
+plotMD(HM_TKS_G1_v_PRO_G1_lyr, main = "HM_TKS_G1 (ref) vs HM_lyr_G1")
+summary(decideTests(HM_TKS_G1_v_PRO_G1_lyr))
+```
+
+```{r DEplot_HM_TKS_G1_v_PRO_G1_lyr_filtered, echo=FALSE}
+
+## lyrata side 
+
+HM_TKS_G1_v_PRO_G1_lyr_filtered <- HM_TKS_G1_v_PRO_G1_lyr[!(HM_TKS_G1_v_PRO_G1_lyr$genes$genes %in% HM_lowC_genes_lyr$V1),]
+
+plotMD(HM_TKS_G1_v_PRO_G1_lyr_filtered, main = "HM_TKS_G1 (ref) vs HM_lyr_G1")
+summary(decideTests(HM_TKS_G1_v_PRO_G1_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = HM_TKS_G1_v_PRO_G1_hal_filtered$genes, 
+                          logFC = HM_TKS_G1_v_PRO_G1_hal_filtered$table$logFC,
+                          logCPM = HM_TKS_G1_v_PRO_G1_hal_filtered$table$logCPM, 
+                          PValue = HM_TKS_G1_v_PRO_G1_hal_filtered$table$PValue,
+                          dir = decideTests(HM_TKS_G1_v_PRO_G1_hal_filtered), 
+                          qvalue = p.adjust(HM_TKS_G1_v_PRO_G1_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "HM_TKSG1_v_halG1_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "HM_TKSG1_v_halG1_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "HM_TKSG1_v_halG1_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = HM_TKS_G1_v_PRO_G1_lyr_filtered$genes, 
+                          logFC = HM_TKS_G1_v_PRO_G1_lyr_filtered$table$logFC,
+                          logCPM = HM_TKS_G1_v_PRO_G1_lyr_filtered$table$logCPM, 
+                          PValue = HM_TKS_G1_v_PRO_G1_lyr_filtered$table$PValue,
+                          dir = decideTests(HM_TKS_G1_v_PRO_G1_lyr_filtered), 
+                          qvalue = p.adjust(HM_TKS_G1_v_PRO_G1_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "HM_TKSG1_v_lyrG1_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "HM_TKSG1_v_lyrG1_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "HM_TKSG1_v_lyrG1_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ natural (TKS) G1 vs _A. kamchatica_ synthetics G1
+
+
+```{r DEplot_HM_TKSG1_SYNG1_hal, echo=FALSE}
+
+## halleri side 
+
+HM_TKS_G1_v_SYN_G1_hal <- exactTest(y_hal, pair = c("HM_TKS_G1", "HM_syn_G1"))
+
+## reverse logFC to have TKS as reference
+
+HM_TKS_G1_v_SYN_G1_hal$table$logFC <- -HM_TKS_G1_v_SYN_G1_hal$table$logFC
+
+plotMD(HM_TKS_G1_v_SYN_G1_hal, main = "HM_TKS_G1 (ref) vs HM_syn_G1")
+summary(decideTests(HM_TKS_G1_v_SYN_G1_hal))
+```
+
+```{r DEplot_HM_TKSG1_SYNG1_hal_filtered, echo=FALSE}
+
+## halleri side 
+
+HM_TKS_G1_v_SYN_G1_hal_filtered <- HM_TKS_G1_v_SYN_G1_hal[!(HM_TKS_G1_v_SYN_G1_hal$genes$genes %in% HM_lowC_genes_hal$V1),]
+
+plotMD(HM_TKS_G1_v_SYN_G1_hal_filtered, main = "HM_TKS_G1 (ref) vs HM_syn_G1 - halleri side")
+summary(decideTests(HM_TKS_G1_v_SYN_G1_hal_filtered))
+```
+
+```{r DEplot_HM_TKSG1_SYNG1_lyr, echo=FALSE}
+
+## lyrata side 
+
+HM_TKS_G1_v_SYN_G1_lyr <- exactTest(y_lyr, pair = c("HM_TKS_G1", "HM_syn_G1"))
+
+## reverse logFC to have TKS as reference
+
+HM_TKS_G1_v_SYN_G1_lyr$table$logFC <- -HM_TKS_G1_v_SYN_G1_lyr$table$logFC
+
+plotMD(HM_TKS_G1_v_SYN_G1_lyr, main = "HM_TKS_G1 (ref) vs HM_syn_G1")
+summary(decideTests(HM_TKS_G1_v_SYN_G1_lyr))
+```
+
+```{r DEplot_HM_TKSG1_SYNG1_lyr_filtered, echo=FALSE}
+
+## lyrata side 
+
+HM_TKS_G1_v_SYN_G1_lyr_filtered <- HM_TKS_G1_v_SYN_G1_lyr[!(HM_TKS_G1_v_SYN_G1_lyr$genes$genes %in% HM_lowC_genes_lyr$V1),]
+
+plotMD(HM_TKS_G1_v_SYN_G1_lyr_filtered, main = "HM_TKS_G1 (ref) vs HM_syn_G1 - lyrata side")
+summary(decideTests(HM_TKS_G1_v_SYN_G1_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = HM_TKS_G1_v_SYN_G1_hal_filtered$genes, 
+                          logFC = HM_TKS_G1_v_SYN_G1_hal_filtered$table$logFC,
+                          logCPM = HM_TKS_G1_v_SYN_G1_hal_filtered$table$logCPM, 
+                          PValue = HM_TKS_G1_v_SYN_G1_hal_filtered$table$PValue,
+                          dir = decideTests(HM_TKS_G1_v_SYN_G1_hal_filtered), 
+                          qvalue = p.adjust(HM_TKS_G1_v_SYN_G1_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "HM_TKSG1_v_RS7G1_hal_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "HM_TKSG1_v_RS7G1_hal_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "HM_TKSG1_v_RS7G1_hal_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = HM_TKS_G1_v_SYN_G1_lyr_filtered$genes, 
+                          logFC = HM_TKS_G1_v_SYN_G1_lyr_filtered$table$logFC,
+                          logCPM = HM_TKS_G1_v_SYN_G1_lyr_filtered$table$logCPM, 
+                          PValue = HM_TKS_G1_v_SYN_G1_lyr_filtered$table$PValue,
+                          dir = decideTests(HM_TKS_G1_v_SYN_G1_lyr_filtered), 
+                          qvalue = p.adjust(HM_TKS_G1_v_SYN_G1_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "HM_TKSG1_v_RS7G1_lyr_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "HM_TKSG1_v_RS7G1_lyr_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "HM_TKSG1_v_RS7G1_lyr_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ natural (TKS) G1 vs _A. kamchatica_ synthetics G4
+
+
+```{r DEplot_HM_TKSG1_SYNG4_hal, echo=FALSE}
+
+## halleri side 
+
+HM_TKS_G1_v_SYN_G4_hal <- exactTest(y_hal, pair = c("HM_TKS_G1", "HM_syn_G4"))
+
+## reverse logFC to have TKS as reference
+
+HM_TKS_G1_v_SYN_G4_hal$table$logFC <- -HM_TKS_G1_v_SYN_G4_hal$table$logFC
+
+plotMD(HM_TKS_G1_v_SYN_G4_hal, main = "HM_TKS_G1 (ref) vs HM_syn_G4")
+summary(decideTests(HM_TKS_G1_v_SYN_G4_hal))
+```
+
+```{r DEplot_HM_TKSG1_SYNG4_hal_filtered, echo=FALSE}
+
+## halleri side 
+
+HM_TKS_G1_v_SYN_G4_hal_filtered <- HM_TKS_G1_v_SYN_G4_hal[!(HM_TKS_G1_v_SYN_G4_hal$genes$genes %in% HM_lowC_genes_hal$V1),]
+
+plotMD(HM_TKS_G1_v_SYN_G4_hal_filtered, main = "HM_TKS_G1 (ref) vs HM_syn_G4 - halleri side")
+summary(decideTests(HM_TKS_G1_v_SYN_G4_hal_filtered))
+```
+
+```{r DEplot_HM_TKSG1_SYNG4_lyr, echo=FALSE}
+
+## lyrata side 
+
+HM_TKS_G1_v_SYN_G4_lyr <- exactTest(y_lyr, pair = c("HM_TKS_G1", "HM_syn_G4"))
+
+## reverse logFC to have TKS as reference
+
+HM_TKS_G1_v_SYN_G4_lyr$table$logFC <- -HM_TKS_G1_v_SYN_G4_lyr$table$logFC
+
+plotMD(HM_TKS_G1_v_SYN_G4_lyr, main = "HM_TKS_G1 (ref) vs HM_syn_G4")
+summary(decideTests(HM_TKS_G1_v_SYN_G4_lyr))
+```
+
+```{r DEplot_HM_TKSG1_SYNG4_lyr_filtered, echo=FALSE}
+
+## lyrata side 
+
+HM_TKS_G1_v_SYN_G4_lyr_filtered <- HM_TKS_G1_v_SYN_G4_lyr[!(HM_TKS_G1_v_SYN_G4_lyr$genes$genes %in% HM_lowC_genes_lyr$V1),]
+
+plotMD(HM_TKS_G1_v_SYN_G4_lyr_filtered, main = "HM_TKS_G1 (ref) vs HM_syn_G4 - lyrata side")
+summary(decideTests(HM_TKS_G1_v_SYN_G4_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = HM_TKS_G1_v_SYN_G4_hal_filtered$genes, 
+                          logFC = HM_TKS_G1_v_SYN_G4_hal_filtered$table$logFC,
+                          logCPM = HM_TKS_G1_v_SYN_G4_hal_filtered$table$logCPM, 
+                          PValue = HM_TKS_G1_v_SYN_G4_hal_filtered$table$PValue,
+                          dir = decideTests(HM_TKS_G1_v_SYN_G4_hal_filtered), 
+                          qvalue = p.adjust(HM_TKS_G1_v_SYN_G4_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "HM_TKSG1_v_RS7G4_hal_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "HM_TKSG1_v_RS7G4_hal_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "HM_TKSG1_v_RS7G4_hal_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = HM_TKS_G1_v_SYN_G4_lyr_filtered$genes, 
+                          logFC = HM_TKS_G1_v_SYN_G4_lyr_filtered$table$logFC,
+                          logCPM = HM_TKS_G1_v_SYN_G4_lyr_filtered$table$logCPM, 
+                          PValue = HM_TKS_G1_v_SYN_G4_lyr_filtered$table$PValue,
+                          dir = decideTests(HM_TKS_G1_v_SYN_G4_lyr_filtered), 
+                          qvalue = p.adjust(HM_TKS_G1_v_SYN_G4_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "HM_TKSG1_v_RS7G4_lyr_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "HM_TKSG1_v_RS7G4_lyr_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "HM_TKSG1_v_RS7G4_lyr_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+
+## _A. kamchatica_ natural (TKS) G1 vs _A. kamchatica_ natural (TKS) G5
+
+
+```{r DEplot_HM_TKSG1_v_G4_hal, echo=FALSE}
+
+## halleri side 
+
+HM_TKS_G4_v_G1_hal <- exactTest(y_hal, pair = c("HM_TKS_G1", "HM_TKS_G5"))
+
+plotMD(HM_TKS_G4_v_G1_hal, main = "HM_TKS_G1 (ref) vs HM_TKS_G5 - halleri side")
+summary(decideTests(HM_TKS_G4_v_G1_hal))
+```
+
+```{r DEplot_HM_TKSG1_v_G4_lyr, echo=FALSE}
+
+## lyrata side 
+
+HM_TKS_G4_v_G1_lyr <- exactTest(y_lyr, pair = c("HM_TKS_G1", "HM_TKS_G5"))
+
+plotMD(HM_TKS_G4_v_G1_lyr, main = "HM_TKS_G1 (ref) vs HM_TKS_G5 - lyrata side")
+summary(decideTests(HM_TKS_G4_v_G1_lyr))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = HM_TKS_G4_v_G1_hal$genes, 
+                          logFC = HM_TKS_G4_v_G1_hal$table$logFC,
+                          logCPM = HM_TKS_G4_v_G1_hal$table$logCPM, 
+                          PValue = HM_TKS_G4_v_G1_hal$table$PValue,
+                          dir = decideTests(HM_TKS_G4_v_G1_hal), 
+                          qvalue = p.adjust(HM_TKS_G4_v_G1_hal$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "HM_TKSG1_v_G5_hal_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "HM_TKSG1_v_G5_hal_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "HM_TKSG1_v_G5_hal_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = HM_TKS_G4_v_G1_lyr$genes, 
+                          logFC = HM_TKS_G4_v_G1_lyr$table$logFC,
+                          logCPM = HM_TKS_G4_v_G1_lyr$table$logCPM, 
+                          PValue = HM_TKS_G4_v_G1_lyr$table$PValue,
+                          dir = decideTests(HM_TKS_G4_v_G1_lyr), 
+                          qvalue = p.adjust(HM_TKS_G4_v_G1_lyr$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "HM_TKSG1_v_G5_lyr_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "HM_TKSG1_v_G5_lyr_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "HM_TKSG1_v_G5_lyr_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+
+# Low Land / Hot conditions
+
+## Progenitors G4 vs progenitors G1
+
+```{r DEplot_LL_halG1_v_G4, echo=FALSE}
+
+## halleri side 
+
+LL_hal_G1_v_G4 <- exactTest(y_hal, pair = c("LL_hal_G1", "LL_hal_G4"))
+
+plotMD(LL_hal_G1_v_G4, main = "LL_hal_G1 (ref) vs LL_hal_G4")
+summary(decideTests(LL_hal_G1_v_G4))
+```
+
+```{r DEplot_LL_lyrG1_v_G4, echo=FALSE}
+
+## lyrata side 
+
+LL_lyr_G1_v_G4 <- exactTest(y_lyr, pair = c("LL_lyr_G1", "LL_lyr_G4"))
+
+plotMD(LL_lyr_G1_v_G4, main = "LL_lyr_G1 (ref) vs LL_lyr_G4")
+summary(decideTests(LL_lyr_G1_v_G4))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = LL_hal_G1_v_G4$genes, 
+                          logFC = LL_hal_G1_v_G4$table$logFC,
+                          logCPM = LL_hal_G1_v_G4$table$logCPM, 
+                          PValue = LL_hal_G1_v_G4$table$PValue,
+                          dir = decideTests(LL_hal_G1_v_G4), 
+                          qvalue = p.adjust(LL_hal_G1_v_G4$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "LL_halG1_v_G4_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "LL_halG1_v_G4_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "LL_halG1_v_G4_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = LL_lyr_G1_v_G4$genes, 
+                          logFC = LL_lyr_G1_v_G4$table$logFC,
+                          logCPM = LL_lyr_G1_v_G4$table$logCPM, 
+                          PValue = LL_lyr_G1_v_G4$table$PValue,
+                          dir = decideTests(LL_lyr_G1_v_G4), 
+                          qvalue = p.adjust(LL_lyr_G1_v_G4$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "LL_lyrG1_v_G4_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "LL_lyrG1_v_G4_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "LL_lyrG1_v_G4_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ synthetics RS7 G1 vs progenitors G1
+
+
+```{r DEplot_LL_halG1_RS7G1, echo=FALSE}
+
+## halleri side 
+
+LL_RS7_G1_v_PRO_G1_hal <- exactTest(y_hal, pair = c("LL_hal_G1", "LL_syn_G1"))
+
+plotMD(LL_RS7_G1_v_PRO_G1_hal, main = "LL_hal_G1 (ref) vs LL_RS7_G1")
+summary(decideTests(LL_RS7_G1_v_PRO_G1_hal))
+```
+
+```{r DEplot_LL_halG1_RS7G1_filtered, echo=FALSE}
+
+## halleri side 
+
+LL_RS7_G1_v_PRO_G1_hal <- exactTest(y_hal, pair = c("LL_hal_G1", "LL_syn_G1"))
+
+LL_RS7_G1_v_PRO_G1_hal_filtered <- LL_RS7_G1_v_PRO_G1_hal[!(LL_RS7_G1_v_PRO_G1_hal$genes$genes %in% LL_lowC_genes_hal$V1),]
+
+plotMD(LL_RS7_G1_v_PRO_G1_hal_filtered, main = "LL_hal_G1 (ref) vs LL_RS7_G1")
+summary(decideTests(LL_RS7_G1_v_PRO_G1_hal_filtered))
+```
+
+```{r DEplot_LL_lyrG1_RS7G1, echo=FALSE}
+
+## lyrata side 
+
+LL_RS7_G1_v_PRO_G1_lyr <- exactTest(y_lyr, pair = c("LL_lyr_G1", "LL_syn_G1"))
+
+plotMD(LL_RS7_G1_v_PRO_G1_lyr, main = "LL_lyr_G1 (ref) vs LL_RS7_G1")
+summary(decideTests(LL_RS7_G1_v_PRO_G1_lyr))
+```
+
+```{r DEplot_LL_lyrG1_RS7G1_filtered, echo=FALSE}
+
+## lyrata side 
+
+LL_RS7_G1_v_PRO_G1_lyr <- exactTest(y_lyr, pair = c("LL_lyr_G1", "LL_syn_G1"))
+
+LL_RS7_G1_v_PRO_G1_lyr_filtered <- LL_RS7_G1_v_PRO_G1_lyr[!(LL_RS7_G1_v_PRO_G1_lyr$genes$genes %in% LL_lowC_genes_lyr$V1),]
+
+plotMD(LL_RS7_G1_v_PRO_G1_lyr_filtered, main = "LL_lyr_G1 (ref) vs LL_RS7_G1")
+summary(decideTests(LL_RS7_G1_v_PRO_G1_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = LL_RS7_G1_v_PRO_G1_hal_filtered$genes, 
+                          logFC = LL_RS7_G1_v_PRO_G1_hal_filtered$table$logFC,
+                          logCPM = LL_RS7_G1_v_PRO_G1_hal_filtered$table$logCPM, 
+                          PValue = LL_RS7_G1_v_PRO_G1_hal_filtered$table$PValue,
+                          dir = decideTests(LL_RS7_G1_v_PRO_G1_hal_filtered), 
+                          qvalue = p.adjust(LL_RS7_G1_v_PRO_G1_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "LL_halG1_v_RS7G1_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "LL_halG1_v_RS7G1_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "LL_halG1_v_RS7G1_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = LL_RS7_G1_v_PRO_G1_lyr_filtered$genes, 
+                          logFC = LL_RS7_G1_v_PRO_G1_lyr_filtered$table$logFC,
+                          logCPM = LL_RS7_G1_v_PRO_G1_lyr_filtered$table$logCPM, 
+                          PValue = LL_RS7_G1_v_PRO_G1_lyr_filtered$table$PValue,
+                          dir = decideTests(LL_RS7_G1_v_PRO_G1_lyr_filtered), 
+                          qvalue = p.adjust(LL_RS7_G1_v_PRO_G1_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "LL_lyrG1_v_RS7G1_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "LL_lyrG1_v_RS7G1_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "LL_lyrG1_v_RS7G1_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ synthetics RS7 G4 vs progenitors G1
+
+```{r DEplot_LL_halG1_RS7G4, echo=FALSE}
+
+## halleri side
+
+LL_RS7_G4_v_PRO_G1_hal <- exactTest(y_hal, pair = c("LL_hal_G1", "LL_syn_G4"))
+
+plotMD(LL_RS7_G4_v_PRO_G1_hal, main = "LL_hal_G1 (ref) vs LL_RS7_G4")
+summary(decideTests(LL_RS7_G4_v_PRO_G1_hal))
+```
+
+```{r DEplot_LL_halG1_RS7G4_filtered, echo=FALSE}
+
+## halleri side 
+
+LL_RS7_G4_v_PRO_G1_hal <- exactTest(y_hal, pair = c("LL_hal_G1", "LL_syn_G4"))
+
+LL_RS7_G4_v_PRO_G1_hal_filtered <- LL_RS7_G4_v_PRO_G1_hal[!(LL_RS7_G4_v_PRO_G1_hal$genes$genes %in% LL_lowC_genes_hal$V1),]
+
+plotMD(LL_RS7_G4_v_PRO_G1_hal_filtered, main = "LL_hal_G1 (ref) vs LL_RS7_G4")
+summary(decideTests(LL_RS7_G4_v_PRO_G1_hal_filtered))
+```
+
+```{r DEplot_LL_lyrG1_RS7G4, echo=FALSE}
+
+## lyrata side 
+
+LL_RS7_G4_v_PRO_G1_lyr <- exactTest(y_lyr, pair = c("LL_lyr_G1", "LL_syn_G4"))
+
+plotMD(LL_RS7_G4_v_PRO_G1_lyr, main = "LL_lyr_G1 (ref) vs LL_RS7_G4")
+summary(decideTests(LL_RS7_G4_v_PRO_G1_lyr))
+```
+
+```{r DEplot_LL_lyrG1_RS7G4_filtered, echo=FALSE}
+
+## lyrata side 
+
+LL_RS7_G4_v_PRO_G1_lyr <- exactTest(y_lyr, pair = c("LL_lyr_G1", "LL_syn_G4"))
+
+LL_RS7_G4_v_PRO_G1_lyr_filtered <- LL_RS7_G4_v_PRO_G1_lyr[!(LL_RS7_G4_v_PRO_G1_lyr$genes$genes %in% LL_lowC_genes_lyr$V1),]
+
+plotMD(LL_RS7_G4_v_PRO_G1_lyr_filtered, main = "LL_lyr_G1 (ref) vs LL_RS7_G4")
+summary(decideTests(LL_RS7_G4_v_PRO_G1_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = LL_RS7_G4_v_PRO_G1_hal_filtered$genes, 
+                          logFC = LL_RS7_G4_v_PRO_G1_hal_filtered$table$logFC,
+                          logCPM = LL_RS7_G4_v_PRO_G1_hal_filtered$table$logCPM, 
+                          PValue = LL_RS7_G4_v_PRO_G1_hal_filtered$table$PValue,
+                          dir = decideTests(LL_RS7_G4_v_PRO_G1_hal_filtered), 
+                          qvalue = p.adjust(LL_RS7_G4_v_PRO_G1_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "LL_halG1_v_RS7G4_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "LL_halG1_v_RS7G4_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "LL_halG1_v_RS7G4_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = LL_RS7_G4_v_PRO_G1_lyr_filtered$genes, 
+                          logFC = LL_RS7_G4_v_PRO_G1_lyr_filtered$table$logFC,
+                          logCPM = LL_RS7_G4_v_PRO_G1_lyr_filtered$table$logCPM, 
+                          PValue = LL_RS7_G4_v_PRO_G1_lyr_filtered$table$PValue,
+                          dir = decideTests(LL_RS7_G4_v_PRO_G1_lyr_filtered), 
+                          qvalue = p.adjust(LL_RS7_G4_v_PRO_G1_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "LL_lyrG1_v_RS7G4_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "LL_lyrG1_v_RS7G4_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "LL_lyrG1_v_RS7G4_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ synthetics RS7 G4 vs _A. kamchatica_ synthetics RS7 G1
+
+
+```{r DEplot_LL_RS7G4_RS7G1_hal, echo=FALSE}
+
+## halleri side 
+
+LL_RS7_G4_v_G1_hal <- exactTest(y_hal, pair = c("LL_syn_G1", "LL_syn_G4"))
+
+plotMD(LL_RS7_G4_v_G1_hal, main = "LL_RS7_G1 (ref) vs LL_RS7_G4 - halleri side")
+summary(decideTests(LL_RS7_G4_v_G1_hal))
+```
+
+```{r DEplot_LL_RS7G4_RS7G1_hal_filtered, echo=FALSE}
+
+## halleri side 
+
+LL_RS7_G4_v_G1_hal <- exactTest(y_hal, pair = c("LL_syn_G1", "LL_syn_G4"))
+
+LL_RS7_G4_v_G1_hal_filtered <- LL_RS7_G4_v_G1_hal[!(LL_RS7_G4_v_G1_hal$genes$genes %in% LL_lowC_genes_hal$V1),]
+
+plotMD(LL_RS7_G4_v_G1_hal_filtered, main = "LL_RS7_G1 (ref) vs LL_RS7_G4 - halleri side")
+summary(decideTests(LL_RS7_G4_v_G1_hal_filtered))
+```
+
+```{r DEplot_LL_RS7G4_RS7G1_lyr, echo=FALSE}
+
+## lyrata side 
+
+LL_RS7_G4_v_G1_lyr <- exactTest(y_lyr, pair = c("LL_syn_G1", "LL_syn_G4"))
+
+plotMD(LL_RS7_G4_v_G1_lyr, main = "LL_RS7_G1 (ref) vs LL_RS7_G4 - lyrata side")
+summary(decideTests(LL_RS7_G4_v_G1_lyr))
+```
+
+```{r DEplot_LL_RS7G4_RS7G1_lyr_filtered, echo=FALSE}
+
+## lyrata side 
+
+LL_RS7_G4_v_G1_lyr <- exactTest(y_lyr, pair = c("LL_syn_G1", "LL_syn_G4"))
+
+LL_RS7_G4_v_G1_lyr_filtered <- LL_RS7_G4_v_G1_lyr[!(LL_RS7_G4_v_G1_lyr$genes$genes %in% LL_lowC_genes_lyr$V1),]
+
+plotMD(LL_RS7_G4_v_G1_lyr_filtered, main = "LL_RS7_G1 (ref) vs LL_RS7_G4 - lyrata side")
+summary(decideTests(LL_RS7_G4_v_G1_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = LL_RS7_G4_v_G1_hal_filtered$genes, 
+                          logFC = LL_RS7_G4_v_G1_hal_filtered$table$logFC,
+                          logCPM = LL_RS7_G4_v_G1_hal_filtered$table$logCPM, 
+                          PValue = LL_RS7_G4_v_G1_hal_filtered$table$PValue,
+                          dir = decideTests(LL_RS7_G4_v_G1_hal_filtered), 
+                          qvalue = p.adjust(LL_RS7_G4_v_G1_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "LL_RS7G1_v_G4_hal_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "LL_RS7G1_v_G4_hal_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "LL_RS7G1_v_G4_hal_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = LL_RS7_G4_v_G1_lyr_filtered$genes, 
+                          logFC = LL_RS7_G4_v_G1_lyr_filtered$table$logFC,
+                          logCPM = LL_RS7_G4_v_G1_lyr_filtered$table$logCPM, 
+                          PValue = LL_RS7_G4_v_G1_lyr_filtered$table$PValue,
+                          dir = decideTests(LL_RS7_G4_v_G1_lyr_filtered), 
+                          qvalue = p.adjust(LL_RS7_G4_v_G1_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "LL_RS7G1_v_G4_lyr_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "LL_RS7G1_v_G4_lyr_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "LL_RS7G1_v_G4_lyr_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ natural (ALK) G1 vs progenitors G1
+
+
+```{r DEplot_LL_ALKG1_PROG1_hal, echo=FALSE}
+
+## halleri side 
+
+LL_ALK_G1_v_PRO_G1_hal <- exactTest(y_hal, pair = c("LL_ALK_G1", "LL_hal_G1"))
+
+plotMD(LL_ALK_G1_v_PRO_G1_hal, main = "LL_ALK_G1 (ref) vs LL_hal_G1")
+summary(decideTests(LL_ALK_G1_v_PRO_G1_hal))
+```
+
+```{r DEplot_LL_ALKG1_PROG1_hal_filtered, echo=FALSE}
+
+## halleri side 
+
+LL_ALK_G1_v_PRO_G1_hal_filtered <- LL_ALK_G1_v_PRO_G1_hal[!(LL_ALK_G1_v_PRO_G1_hal$genes$genes %in% LL_lowC_genes_hal$V1),]
+
+plotMD(LL_ALK_G1_v_PRO_G1_hal_filtered, main = "LL_ALK_G1 (ref) vs LL_hal_G1 - halleri side")
+summary(decideTests(LL_ALK_G1_v_PRO_G1_hal_filtered))
+```
+
+```{r DEplot_LL_ALKG1_PROG1_lyr, echo=FALSE}
+
+## lyrata side 
+
+LL_ALK_G1_v_PRO_G1_lyr <- exactTest(y_lyr, pair = c("LL_ALK_G1", "LL_lyr_G1"))
+
+plotMD(LL_ALK_G1_v_PRO_G1_lyr, main = "LL_ALK_G1 (ref) vs LL_lyr_G1")
+summary(decideTests(LL_ALK_G1_v_PRO_G1_lyr))
+```
+
+```{r DEplot_LL_ALKG1_PROG1_lyr_filtered, echo=FALSE}
+
+## lyrata side 
+
+LL_ALK_G1_v_PRO_G1_lyr_filtered <- LL_ALK_G1_v_PRO_G1_lyr[!(LL_ALK_G1_v_PRO_G1_lyr$genes$genes %in% LL_lowC_genes_lyr$V1),]
+
+plotMD(LL_ALK_G1_v_PRO_G1_lyr_filtered, main = "LL_ALK_G1 (ref) vs LL_lyr_G1 - lyrata side")
+summary(decideTests(LL_ALK_G1_v_PRO_G1_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = LL_ALK_G1_v_PRO_G1_hal_filtered$genes, 
+                          logFC = LL_ALK_G1_v_PRO_G1_hal_filtered$table$logFC,
+                          logCPM = LL_ALK_G1_v_PRO_G1_hal_filtered$table$logCPM, 
+                          PValue = LL_ALK_G1_v_PRO_G1_hal_filtered$table$PValue,
+                          dir = decideTests(LL_ALK_G1_v_PRO_G1_hal_filtered), 
+                          qvalue = p.adjust(LL_ALK_G1_v_PRO_G1_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "LL_ALKG1_v_halG1_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "LL_ALKG1_v_halG1_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "LL_ALKG1_v_halG1_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = LL_ALK_G1_v_PRO_G1_lyr_filtered$genes, 
+                          logFC = LL_ALK_G1_v_PRO_G1_lyr_filtered$table$logFC,
+                          logCPM = LL_ALK_G1_v_PRO_G1_lyr_filtered$table$logCPM, 
+                          PValue = LL_ALK_G1_v_PRO_G1_lyr_filtered$table$PValue,
+                          dir = decideTests(LL_ALK_G1_v_PRO_G1_lyr_filtered), 
+                          qvalue = p.adjust(LL_ALK_G1_v_PRO_G1_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "LL_ALKG1_v_lyrG1_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "LL_ALKG1_v_lyrG1_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "LL_ALKG1_v_lyrG1_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ natural (ALK) G1 vs _A. kamchatica_ synthetics G1
+
+
+```{r DEplot_LL_ALKG1_SYNG1_hal, echo=FALSE}
+
+## halleri side 
+
+LL_ALK_G1_v_SYN_G1_hal <- exactTest(y_hal, pair = c("LL_ALK_G1", "LL_syn_G1"))
+
+plotMD(LL_ALK_G1_v_SYN_G1_hal, main = "LL_ALK_G1 (ref) vs LL_syn_G1")
+summary(decideTests(LL_ALK_G1_v_SYN_G1_hal))
+```
+
+```{r DEplot_LL_ALKG1_SYNG1_hal_filtered, echo=FALSE}
+
+## halleri side 
+
+LL_ALK_G1_v_SYN_G1_hal_filtered <- LL_ALK_G1_v_SYN_G1_hal[!(LL_ALK_G1_v_SYN_G1_hal$genes$genes %in% LL_lowC_genes_hal$V1),]
+
+plotMD(LL_ALK_G1_v_SYN_G1_hal_filtered, main = "LL_ALK_G1 (ref) vs LL_SYN_G1 - halleri side")
+summary(decideTests(LL_ALK_G1_v_SYN_G1_hal_filtered))
+```
+
+```{r DEplot_LL_ALKG1_SYNG1_lyr, echo=FALSE}
+
+## lyrata side 
+
+LL_ALK_G1_v_SYN_G1_lyr <- exactTest(y_lyr, pair = c("LL_ALK_G1", "LL_syn_G1"))
+
+plotMD(LL_ALK_G1_v_SYN_G1_lyr, main = "LL_ALK_G1 (ref) vs LL_syn_G1")
+summary(decideTests(LL_ALK_G1_v_SYN_G1_lyr))
+```
+
+```{r DEplot_LL_ALKG1_SYNG1_lyr_filtered, echo=FALSE}
+
+## lyrata side 
+
+LL_ALK_G1_v_SYN_G1_lyr_filtered <- LL_ALK_G1_v_SYN_G1_lyr[!(LL_ALK_G1_v_SYN_G1_lyr$genes$genes %in% LL_lowC_genes_lyr$V1),]
+
+plotMD(LL_ALK_G1_v_SYN_G1_lyr_filtered, main = "LL_ALK_G1 (ref) vs LL_SYN_G1 - lyrata side")
+summary(decideTests(LL_ALK_G1_v_SYN_G1_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = LL_ALK_G1_v_SYN_G1_hal_filtered$genes, 
+                          logFC = LL_ALK_G1_v_SYN_G1_hal_filtered$table$logFC,
+                          logCPM = LL_ALK_G1_v_SYN_G1_hal_filtered$table$logCPM, 
+                          PValue = LL_ALK_G1_v_SYN_G1_hal_filtered$table$PValue,
+                          dir = decideTests(LL_ALK_G1_v_SYN_G1_hal_filtered), 
+                          qvalue = p.adjust(LL_ALK_G1_v_SYN_G1_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "LL_ALKG1_v_RS7G1_hal_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "LL_ALKG1_v_RS7G1_hal_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "LL_ALKG1_v_RS7G1_hal_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = LL_ALK_G1_v_SYN_G1_lyr_filtered$genes, 
+                          logFC = LL_ALK_G1_v_SYN_G1_lyr_filtered$table$logFC,
+                          logCPM = LL_ALK_G1_v_SYN_G1_lyr_filtered$table$logCPM, 
+                          PValue = LL_ALK_G1_v_SYN_G1_lyr_filtered$table$PValue,
+                          dir = decideTests(LL_ALK_G1_v_SYN_G1_lyr_filtered), 
+                          qvalue = p.adjust(LL_ALK_G1_v_SYN_G1_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "LL_ALKG1_v_RS7G1_lyr_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "LL_ALKG1_v_RS7G1_lyr_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "LL_ALKG1_v_RS7G1_lyr_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ natural (ALK) G1 vs _A. kamchatica_ synthetics G4
+
+
+```{r DEplot_LL_ALKG1_SYNG4_hal, echo=FALSE}
+
+## halleri side 
+
+LL_ALK_G1_v_SYN_G4_hal <- exactTest(y_hal, pair = c("LL_ALK_G1", "LL_syn_G4"))
+
+plotMD(LL_ALK_G1_v_SYN_G4_hal, main = "LL_ALK_G1 (ref) vs LL_syn_G4")
+summary(decideTests(LL_ALK_G1_v_SYN_G4_hal))
+```
+
+```{r DEplot_LL_ALKG1_SYNG4_hal_filtered, echo=FALSE}
+
+## halleri side 
+
+LL_ALK_G1_v_SYN_G4_hal_filtered <- LL_ALK_G1_v_SYN_G4_hal[!(LL_ALK_G1_v_SYN_G4_hal$genes$genes %in% LL_lowC_genes_hal$V1),]
+
+plotMD(LL_ALK_G1_v_SYN_G4_hal_filtered, main = "LL_ALK_G1 (ref) vs LL_SYN_G4 - halleri side")
+summary(decideTests(LL_ALK_G1_v_SYN_G4_hal_filtered))
+```
+
+```{r DEplot_LL_ALKG1_SYNG4_lyr, echo=FALSE}
+
+## lyrata side 
+
+LL_ALK_G1_v_SYN_G4_lyr <- exactTest(y_lyr, pair = c("LL_ALK_G1", "LL_syn_G4"))
+
+plotMD(LL_ALK_G1_v_SYN_G4_lyr, main = "LL_ALK_G1 (ref) vs LL_syn_G4")
+summary(decideTests(LL_ALK_G1_v_SYN_G4_lyr))
+```
+
+```{r DEplot_LL_ALKG1_SYNG4_lyr_filtered, echo=FALSE}
+
+## lyrata side 
+
+LL_ALK_G1_v_SYN_G4_lyr_filtered <- LL_ALK_G1_v_SYN_G4_lyr[!(LL_ALK_G1_v_SYN_G4_lyr$genes$genes %in% LL_lowC_genes_lyr$V1),]
+
+plotMD(LL_ALK_G1_v_SYN_G4_lyr_filtered, main = "LL_ALK_G1 (ref) vs LL_SYN_G4 - lyrata side")
+summary(decideTests(LL_ALK_G1_v_SYN_G4_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = LL_ALK_G1_v_SYN_G4_hal_filtered$genes, 
+                          logFC = LL_ALK_G1_v_SYN_G4_hal_filtered$table$logFC,
+                          logCPM = LL_ALK_G1_v_SYN_G4_hal_filtered$table$logCPM, 
+                          PValue = LL_ALK_G1_v_SYN_G4_hal_filtered$table$PValue,
+                          dir = decideTests(LL_ALK_G1_v_SYN_G4_hal_filtered), 
+                          qvalue = p.adjust(LL_ALK_G1_v_SYN_G4_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "LL_ALKG1_v_RS7G4_hal_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "LL_ALKG1_v_RS7G4_hal_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "LL_ALKG1_v_RS7G4_hal_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = LL_ALK_G1_v_SYN_G4_lyr_filtered$genes, 
+                          logFC = LL_ALK_G1_v_SYN_G4_lyr_filtered$table$logFC,
+                          logCPM = LL_ALK_G1_v_SYN_G4_lyr_filtered$table$logCPM, 
+                          PValue = LL_ALK_G1_v_SYN_G4_lyr_filtered$table$PValue,
+                          dir = decideTests(LL_ALK_G1_v_SYN_G4_lyr_filtered), 
+                          qvalue = p.adjust(LL_ALK_G1_v_SYN_G4_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "LL_ALKG1_v_RS7G4_lyr_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "LL_ALKG1_v_RS7G4_lyr_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "LL_ALKG1_v_RS7G4_lyr_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ natural (ALK) G1 vs _A. kamchatica_ natural (ALK) G4
+
+
+```{r DEplot_LL_ALKG1_v_G4_hal, echo=FALSE}
+
+## halleri side 
+
+LL_ALK_G4_v_G1_hal <- exactTest(y_hal, pair = c("LL_ALK_G1", "LL_ALK_G4"))
+
+plotMD(LL_ALK_G4_v_G1_hal, main = "LL_ALK_G1 (ref) vs LL_ALK_G4 - halleri side")
+summary(decideTests(LL_ALK_G4_v_G1_hal))
+```
+
+```{r DEplot_LL_ALKG1_v_G4_lyr, echo=FALSE}
+
+## lyrata side 
+
+LL_ALK_G4_v_G1_lyr <- exactTest(y_lyr, pair = c("LL_ALK_G1", "LL_ALK_G4"))
+
+plotMD(LL_ALK_G4_v_G1_lyr, main = "LL_ALK_G1 (ref) vs LL_ALK_G4 - lyrata side")
+summary(decideTests(LL_ALK_G4_v_G1_lyr))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = LL_ALK_G4_v_G1_hal$genes, 
+                          logFC = LL_ALK_G4_v_G1_hal$table$logFC,
+                          logCPM = LL_ALK_G4_v_G1_hal$table$logCPM, 
+                          PValue = LL_ALK_G4_v_G1_hal$table$PValue,
+                          dir = decideTests(LL_ALK_G4_v_G1_hal), 
+                          qvalue = p.adjust(LL_ALK_G4_v_G1_hal$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "LL_ALKG1_v_G4_hal_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "LL_ALKG1_v_G4_hal_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "LL_ALKG1_v_G4_hal_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = LL_ALK_G4_v_G1_lyr$genes, 
+                          logFC = LL_ALK_G4_v_G1_lyr$table$logFC,
+                          logCPM = LL_ALK_G4_v_G1_lyr$table$logCPM, 
+                          PValue = LL_ALK_G4_v_G1_lyr$table$PValue,
+                          dir = decideTests(LL_ALK_G4_v_G1_lyr), 
+                          qvalue = p.adjust(LL_ALK_G4_v_G1_lyr$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "LL_ALKG1_v_G4_lyr_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "LL_ALKG1_v_G4_lyr_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "LL_ALKG1_v_G4_lyr_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+
+## _A. kamchatica_ natural (TKS) G1 vs progenitors G1
+
+
+```{r DEplot_LL_TKSG1_PROG1_hal, echo=FALSE}
+
+## halleri side 
+
+LL_TKS_G1_v_PRO_G1_hal <- exactTest(y_hal, pair = c("LL_TKS_G1", "LL_hal_G1"))
+
+## reverse logFC to have TKS as reference
+
+LL_TKS_G1_v_PRO_G1_hal$table$logFC <- -LL_TKS_G1_v_PRO_G1_hal$table$logFC
+
+plotMD(LL_TKS_G1_v_PRO_G1_hal, main = "LL_TKS_G1 (ref) vs LL_hal_G1")
+summary(decideTests(LL_TKS_G1_v_PRO_G1_hal))
+```
+
+```{r DEplot_LL_TKSG1_PROG1_hal_filtered, echo=FALSE}
+
+## halleri side 
+
+LL_TKS_G1_v_PRO_G1_hal_filtered <- LL_TKS_G1_v_PRO_G1_hal[!(LL_TKS_G1_v_PRO_G1_hal$genes$genes %in% LL_lowC_genes_hal$V1),]
+
+plotMD(LL_TKS_G1_v_PRO_G1_hal_filtered, main = "LL_TKS_G1 (ref) vs LL_hal_G1 - halleri side")
+summary(decideTests(LL_TKS_G1_v_PRO_G1_hal_filtered))
+```
+
+```{r DEplot_LL_TKSG1_PROG1_lyr, echo=FALSE}
+
+## lyrata side 
+
+LL_TKS_G1_v_PRO_G1_lyr <- exactTest(y_lyr, pair = c("LL_TKS_G1", "LL_lyr_G1"))
+
+## reverse logFC to have TKS as reference
+
+LL_TKS_G1_v_PRO_G1_lyr$table$logFC <- -LL_TKS_G1_v_PRO_G1_lyr$table$logFC
+
+plotMD(LL_TKS_G1_v_PRO_G1_lyr, main = "LL_TKS_G1 (ref) vs LL_lyr_G1")
+summary(decideTests(LL_TKS_G1_v_PRO_G1_lyr))
+```
+
+```{r DEplot_LL_TKSG1_PROG1_lyr_filtered, echo=FALSE}
+
+## lyrata side 
+
+LL_TKS_G1_v_PRO_G1_lyr_filtered <- LL_TKS_G1_v_PRO_G1_lyr[!(LL_TKS_G1_v_PRO_G1_lyr$genes$genes %in% LL_lowC_genes_lyr$V1),]
+
+plotMD(LL_TKS_G1_v_PRO_G1_lyr_filtered, main = "LL_TKS_G1 (ref) vs LL_lyr_G1 - lyrata side")
+summary(decideTests(LL_TKS_G1_v_PRO_G1_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = LL_TKS_G1_v_PRO_G1_hal_filtered$genes, 
+                          logFC = LL_TKS_G1_v_PRO_G1_hal_filtered$table$logFC,
+                          logCPM = LL_TKS_G1_v_PRO_G1_hal_filtered$table$logCPM, 
+                          PValue = LL_TKS_G1_v_PRO_G1_hal_filtered$table$PValue,
+                          dir = decideTests(LL_TKS_G1_v_PRO_G1_hal_filtered), 
+                          qvalue = p.adjust(LL_TKS_G1_v_PRO_G1_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "LL_TKSG1_v_halG1_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "LL_TKSG1_v_halG1_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "LL_TKSG1_v_halG1_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = LL_TKS_G1_v_PRO_G1_lyr_filtered$genes, 
+                          logFC = LL_TKS_G1_v_PRO_G1_lyr_filtered$table$logFC,
+                          logCPM = LL_TKS_G1_v_PRO_G1_lyr_filtered$table$logCPM, 
+                          PValue = LL_TKS_G1_v_PRO_G1_lyr_filtered$table$PValue,
+                          dir = decideTests(LL_TKS_G1_v_PRO_G1_lyr_filtered), 
+                          qvalue = p.adjust(LL_TKS_G1_v_PRO_G1_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "LL_TKSG1_v_lyrG1_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "LL_TKSG1_v_lyrG1_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "LL_TKSG1_v_lyrG1_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ natural (TKS) G1 vs _A. kamchatica_ synthetics G1
+
+
+```{r DEplot_LL_TKSG1_SYNG1_hal, echo=FALSE}
+
+## halleri side 
+
+LL_TKS_G1_v_SYN_G1_hal <- exactTest(y_hal, pair = c("LL_TKS_G1", "LL_syn_G1"))
+
+## reverse logFC to have TKS as reference
+
+LL_TKS_G1_v_SYN_G1_hal$table$logFC <- -LL_TKS_G1_v_SYN_G1_hal$table$logFC
+
+plotMD(LL_TKS_G1_v_SYN_G1_hal, main = "LL_TKS_G1 (ref) vs LL_syn_G1")
+summary(decideTests(LL_TKS_G1_v_SYN_G1_hal))
+```
+
+```{r DEplot_LL_TKSG1_SYNG1_hal_filtered, echo=FALSE}
+
+## halleri side 
+
+LL_TKS_G1_v_SYN_G1_hal_filtered <- LL_TKS_G1_v_SYN_G1_hal[!(LL_TKS_G1_v_SYN_G1_hal$genes$genes %in% LL_lowC_genes_hal$V1),]
+
+plotMD(LL_TKS_G1_v_SYN_G1_hal_filtered, main = "LL_TKS_G1 (ref) vs LL_syn_G1 - halleri side")
+summary(decideTests(LL_TKS_G1_v_SYN_G1_hal_filtered))
+```
+
+```{r DEplot_LL_TKSG1_SYNG1_lyr, echo=FALSE}
+
+## lyrata side 
+
+LL_TKS_G1_v_SYN_G1_lyr <- exactTest(y_lyr, pair = c("LL_TKS_G1", "LL_syn_G1"))
+
+## reverse logFC to have TKS as reference
+
+LL_TKS_G1_v_SYN_G1_lyr$table$logFC <- -LL_TKS_G1_v_SYN_G1_lyr$table$logFC
+
+plotMD(LL_TKS_G1_v_SYN_G1_lyr, main = "LL_TKS_G1 (ref) vs LL_syn_G1")
+summary(decideTests(LL_TKS_G1_v_SYN_G1_lyr))
+```
+
+```{r DEplot_LL_TKSG1_SYNG1_lyr_filtered, echo=FALSE}
+
+## lyrata side 
+
+LL_TKS_G1_v_SYN_G1_lyr_filtered <- LL_TKS_G1_v_SYN_G1_lyr[!(LL_TKS_G1_v_SYN_G1_lyr$genes$genes %in% LL_lowC_genes_lyr$V1),]
+
+plotMD(LL_TKS_G1_v_SYN_G1_lyr_filtered, main = "LL_TKS_G1 (ref) vs LL_syn_G1 - lyrata side")
+summary(decideTests(LL_TKS_G1_v_SYN_G1_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = LL_TKS_G1_v_SYN_G1_hal_filtered$genes, 
+                          logFC = LL_TKS_G1_v_SYN_G1_hal_filtered$table$logFC,
+                          logCPM = LL_TKS_G1_v_SYN_G1_hal_filtered$table$logCPM, 
+                          PValue = LL_TKS_G1_v_SYN_G1_hal_filtered$table$PValue,
+                          dir = decideTests(LL_TKS_G1_v_SYN_G1_hal_filtered), 
+                          qvalue = p.adjust(LL_TKS_G1_v_SYN_G1_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "LL_TKSG1_v_RS7G1_hal_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "LL_TKSG1_v_RS7G1_hal_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "LL_TKSG1_v_RS7G1_hal_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = LL_TKS_G1_v_SYN_G1_lyr_filtered$genes, 
+                          logFC = LL_TKS_G1_v_SYN_G1_lyr_filtered$table$logFC,
+                          logCPM = LL_TKS_G1_v_SYN_G1_lyr_filtered$table$logCPM, 
+                          PValue = LL_TKS_G1_v_SYN_G1_lyr_filtered$table$PValue,
+                          dir = decideTests(LL_TKS_G1_v_SYN_G1_lyr_filtered), 
+                          qvalue = p.adjust(LL_TKS_G1_v_SYN_G1_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "LL_TKSG1_v_RS7G1_lyr_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "LL_TKSG1_v_RS7G1_lyr_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "LL_TKSG1_v_RS7G1_lyr_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ natural (TKS) G1 vs _A. kamchatica_ synthetics G4
+
+
+```{r DEplot_LL_TKSG1_SYNG4_hal, echo=FALSE}
+
+## halleri side 
+
+LL_TKS_G1_v_SYN_G4_hal <- exactTest(y_hal, pair = c("LL_TKS_G1", "LL_syn_G4"))
+
+## reverse logFC to have TKS as reference
+
+LL_TKS_G1_v_SYN_G4_hal$table$logFC <- -LL_TKS_G1_v_SYN_G4_hal$table$logFC
+
+plotMD(LL_TKS_G1_v_SYN_G4_hal, main = "LL_TKS_G1 (ref) vs LL_syn_G4")
+summary(decideTests(LL_TKS_G1_v_SYN_G4_hal))
+```
+
+```{r DEplot_LL_TKSG1_SYNG4_hal_filtered, echo=FALSE}
+
+## halleri side 
+
+LL_TKS_G1_v_SYN_G4_hal_filtered <- LL_TKS_G1_v_SYN_G4_hal[!(LL_TKS_G1_v_SYN_G4_hal$genes$genes %in% LL_lowC_genes_hal$V1),]
+
+plotMD(LL_TKS_G1_v_SYN_G4_hal_filtered, main = "LL_TKS_G1 (ref) vs LL_syn_G4 - halleri side")
+summary(decideTests(LL_TKS_G1_v_SYN_G4_hal_filtered))
+```
+
+```{r DEplot_LL_TKSG1_SYNG4_lyr, echo=FALSE}
+
+## lyrata side 
+
+LL_TKS_G1_v_SYN_G4_lyr <- exactTest(y_lyr, pair = c("LL_TKS_G1", "LL_syn_G4"))
+
+## reverse logFC to have TKS as reference
+
+LL_TKS_G1_v_SYN_G4_lyr$table$logFC <- -LL_TKS_G1_v_SYN_G4_lyr$table$logFC
+
+plotMD(LL_TKS_G1_v_SYN_G4_lyr, main = "LL_TKS_G1 (ref) vs LL_syn_G4")
+summary(decideTests(LL_TKS_G1_v_SYN_G4_lyr))
+```
+
+```{r DEplot_LL_TKSG1_SYNG4_lyr_filtered, echo=FALSE}
+
+## lyrata side 
+
+LL_TKS_G1_v_SYN_G4_lyr_filtered <- LL_TKS_G1_v_SYN_G4_lyr[!(LL_TKS_G1_v_SYN_G4_lyr$genes$genes %in% LL_lowC_genes_lyr$V1),]
+
+plotMD(LL_TKS_G1_v_SYN_G4_lyr_filtered, main = "LL_TKS_G1 (ref) vs LL_syn_G4 - lyrata side")
+summary(decideTests(LL_TKS_G1_v_SYN_G4_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = LL_TKS_G1_v_SYN_G4_hal_filtered$genes, 
+                          logFC = LL_TKS_G1_v_SYN_G4_hal_filtered$table$logFC,
+                          logCPM = LL_TKS_G1_v_SYN_G4_hal_filtered$table$logCPM, 
+                          PValue = LL_TKS_G1_v_SYN_G4_hal_filtered$table$PValue,
+                          dir = decideTests(LL_TKS_G1_v_SYN_G4_hal_filtered), 
+                          qvalue = p.adjust(LL_TKS_G1_v_SYN_G4_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "LL_TKSG1_v_RS7G4_hal_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "LL_TKSG1_v_RS7G4_hal_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "LL_TKSG1_v_RS7G4_hal_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = LL_TKS_G1_v_SYN_G4_lyr_filtered$genes, 
+                          logFC = LL_TKS_G1_v_SYN_G4_lyr_filtered$table$logFC,
+                          logCPM = LL_TKS_G1_v_SYN_G4_lyr_filtered$table$logCPM, 
+                          PValue = LL_TKS_G1_v_SYN_G4_lyr_filtered$table$PValue,
+                          dir = decideTests(LL_TKS_G1_v_SYN_G4_lyr_filtered), 
+                          qvalue = p.adjust(LL_TKS_G1_v_SYN_G4_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "LL_TKSG1_v_RS7G4_lyr_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "LL_TKSG1_v_RS7G4_lyr_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "LL_TKSG1_v_RS7G4_lyr_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+
+## _A. kamchatica_ natural (TKS) G1 vs _A. kamchatica_ natural (TKS) G5
+
+
+```{r DEplot_LL_TKSG1_v_G4_hal, echo=FALSE}
+
+## halleri side 
+
+LL_TKS_G4_v_G1_hal <- exactTest(y_hal, pair = c("LL_TKS_G1", "LL_TKS_G5"))
+
+plotMD(LL_TKS_G4_v_G1_hal, main = "LL_TKS_G1 (ref) vs LL_TKS_G5 - halleri side")
+summary(decideTests(LL_TKS_G4_v_G1_hal))
+```
+
+```{r DEplot_LL_TKSG1_v_G4_lyr, echo=FALSE}
+
+## lyrata side 
+
+LL_TKS_G4_v_G1_lyr <- exactTest(y_lyr, pair = c("LL_TKS_G1", "LL_TKS_G5"))
+
+plotMD(LL_TKS_G4_v_G1_lyr, main = "LL_TKS_G1 (ref) vs LL_TKS_G5 - lyrata side")
+summary(decideTests(LL_TKS_G4_v_G1_lyr))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = LL_TKS_G4_v_G1_hal$genes, 
+                          logFC = LL_TKS_G4_v_G1_hal$table$logFC,
+                          logCPM = LL_TKS_G4_v_G1_hal$table$logCPM, 
+                          PValue = LL_TKS_G4_v_G1_hal$table$PValue,
+                          dir = decideTests(LL_TKS_G4_v_G1_hal), 
+                          qvalue = p.adjust(LL_TKS_G4_v_G1_hal$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "LL_TKSG1_v_G5_hal_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "LL_TKSG1_v_G5_hal_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "LL_TKSG1_v_G5_hal_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = LL_TKS_G4_v_G1_lyr$genes, 
+                          logFC = LL_TKS_G4_v_G1_lyr$table$logFC,
+                          logCPM = LL_TKS_G4_v_G1_lyr$table$logCPM, 
+                          PValue = LL_TKS_G4_v_G1_lyr$table$PValue,
+                          dir = decideTests(LL_TKS_G4_v_G1_lyr), 
+                          qvalue = p.adjust(LL_TKS_G4_v_G1_lyr$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "LL_TKSG1_v_G5_lyr_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "LL_TKSG1_v_G5_lyr_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "LL_TKSG1_v_G5_lyr_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+# High Mountain / Cold conditions vs Low Land / Hot conditions
+
+## _A. kamchatica_ synthetic (HM) G1 vs _A. kamchatica_ synthetic (LL) G1
+
+
+```{r DEplot_synG1_HMvsLL_hal, echo=FALSE}
+
+## halleri side 
+
+synG1_HMvLL_hal <- exactTest(y_hal, pair = c("HM_syn_G1", "LL_syn_G1"))
+
+plotMD(synG1_HMvLL_hal, main = "HM_syn_G1 (ref) vs LL_syn_G1 - halleri side")
+summary(decideTests(synG1_HMvLL_hal))
+```
+
+```{r DEplot_synG1_HMvsLL_hal_filtered, echo=FALSE}
+
+## halleri side 
+
+synG1_HMvLL_hal_filtered <- synG1_HMvLL_hal[!(synG1_HMvLL_hal$genes$genes %in% HM_lowC_genes_hal$V1),]
+
+synG1_HMvLL_hal_filtered <- synG1_HMvLL_hal[!(synG1_HMvLL_hal$genes$genes %in% LL_lowC_genes_hal$V1),]
+
+plotMD(synG1_HMvLL_hal_filtered, main = "HM_syn_G1 (ref) vs LL_syn_G1 - halleri side")
+summary(decideTests(synG1_HMvLL_hal_filtered))
+```
+
+```{r DEplot_synG1_HMvLL_lyr, echo=FALSE}
+
+## lyrata side 
+
+synG1_HMvLL_lyr <- exactTest(y_lyr, pair = c("HM_syn_G1", "LL_syn_G1"))
+
+plotMD(synG1_HMvLL_lyr, main = "HM_syn_G1 (ref) vs LL_syn_G1 - lyrata side")
+summary(decideTests(synG1_HMvLL_lyr))
+```
+
+```{r DEplot_synG1_HMvsLL_lyr_filtered, echo=FALSE}
+
+## lyrata side 
+
+synG1_HMvLL_lyr_filtered <- synG1_HMvLL_lyr[!(synG1_HMvLL_lyr$genes$genes %in% HM_lowC_genes_lyr$V1),]
+
+synG1_HMvLL_lyr_filtered <- synG1_HMvLL_lyr[!(synG1_HMvLL_lyr$genes$genes %in% LL_lowC_genes_lyr$V1),]
+
+plotMD(synG1_HMvLL_lyr_filtered, main = "HM_syn_G1 (ref) vs LL_syn_G1 - lyrata side")
+summary(decideTests(synG1_HMvLL_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = synG1_HMvLL_hal_filtered$genes, 
+                          logFC = synG1_HMvLL_hal_filtered$table$logFC,
+                          logCPM = synG1_HMvLL_hal_filtered$table$logCPM, 
+                          PValue = synG1_HMvLL_hal_filtered$table$PValue,
+                          dir = decideTests(synG1_HMvLL_hal_filtered), 
+                          qvalue = p.adjust(synG1_HMvLL_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "synG1_HMvLL_hal_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "synG1_HMvLL_hal_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "synG1_HMvLL_hal_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = synG1_HMvLL_lyr_filtered$genes, 
+                          logFC = synG1_HMvLL_lyr_filtered$table$logFC,
+                          logCPM = synG1_HMvLL_lyr_filtered$table$logCPM, 
+                          PValue = synG1_HMvLL_lyr_filtered$table$PValue,
+                          dir = decideTests(synG1_HMvLL_lyr_filtered), 
+                          qvalue = p.adjust(synG1_HMvLL_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "synG1_HMvLL_lyr_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "synG1_HMvLL_lyr_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "synG1_HMvLL_lyr_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
+
+## _A. kamchatica_ synthetic (HM) G4 vs _A. kamchatica_ synthetic (LL) G4
+
+
+```{r DEplot_synG4_HMvsLL_hal, echo=FALSE}
+
+## halleri side 
+
+synG4_HMvLL_hal <- exactTest(y_hal, pair = c("HM_syn_G4", "LL_syn_G4"))
+
+plotMD(synG4_HMvLL_hal, main = "HM_syn_G4 (ref) vs LL_syn_G4 - halleri side")
+summary(decideTests(synG4_HMvLL_hal))
+```
+
+```{r DEplot_synG4_HMvsLL_hal_filtered, echo=FALSE}
+
+## halleri side 
+
+synG4_HMvLL_hal_filtered <- synG4_HMvLL_hal[!(synG4_HMvLL_hal$genes$genes %in% HM_lowC_genes_hal$V1),]
+
+synG4_HMvLL_hal_filtered <- synG4_HMvLL_hal[!(synG4_HMvLL_hal$genes$genes %in% LL_lowC_genes_hal$V1),]
+
+plotMD(synG4_HMvLL_hal_filtered, main = "HM_syn_G4 (ref) vs LL_syn_G4 - halleri side")
+summary(decideTests(synG4_HMvLL_hal_filtered))
+```
+
+```{r DEplot_synG4_HMvLL_lyr, echo=FALSE}
+
+## lyrata side 
+
+synG4_HMvLL_lyr <- exactTest(y_lyr, pair = c("HM_syn_G4", "LL_syn_G4"))
+
+plotMD(synG4_HMvLL_lyr, main = "HM_syn_G4 (ref) vs LL_syn_G4 - lyrata side")
+summary(decideTests(synG4_HMvLL_lyr))
+```
+
+```{r DEplot_synG4_HMvsLL_lyr_filtered, echo=FALSE}
+
+## lyrata side 
+
+synG4_HMvLL_lyr_filtered <- synG4_HMvLL_lyr[!(synG4_HMvLL_lyr$genes$genes %in% HM_lowC_genes_lyr$V1),]
+
+synG4_HMvLL_lyr_filtered <- synG4_HMvLL_lyr[!(synG4_HMvLL_lyr$genes$genes %in% LL_lowC_genes_lyr$V1),]
+
+plotMD(synG4_HMvLL_lyr_filtered, main = "HM_syn_G4 (ref) vs LL_syn_G4 - lyrata side")
+summary(decideTests(synG4_HMvLL_lyr_filtered))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# output txt files with list of DEG
+
+summary_hal <- data.frame(geneID = synG4_HMvLL_hal_filtered$genes, 
+                          logFC = synG4_HMvLL_hal_filtered$table$logFC,
+                          logCPM = synG4_HMvLL_hal_filtered$table$logCPM, 
+                          PValue = synG4_HMvLL_hal_filtered$table$PValue,
+                          dir = decideTests(synG4_HMvLL_hal_filtered), 
+                          qvalue = p.adjust(synG4_HMvLL_hal_filtered$table$PValue, method = "BH"))
+colnames(summary_hal) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_hal <- dplyr::filter(summary_hal, qvalue < .05)
+
+write.table(summary_hal, file = paste0(output_path, "synG4_HMvLL_hal_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == 1), file = paste0(output_path,  "synG4_HMvLL_hal_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_hal, dir == -1), file = paste0(output_path,  "synG4_HMvLL_hal_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+summary_lyr <- data.frame(geneID = synG4_HMvLL_lyr_filtered$genes, 
+                          logFC = synG4_HMvLL_lyr_filtered$table$logFC,
+                          logCPM = synG4_HMvLL_lyr_filtered$table$logCPM, 
+                          PValue = synG4_HMvLL_lyr_filtered$table$PValue,
+                          dir = decideTests(synG4_HMvLL_lyr_filtered), 
+                          qvalue = p.adjust(synG4_HMvLL_lyr_filtered$table$PValue, method = "BH"))
+colnames(summary_lyr) <- c("geneID", "logFC", "logCPM", "PValue", "dir", "qvalue")
+summary_lyr <- dplyr::filter(summary_lyr, qvalue < .05)
+
+write.table(summary_lyr, file = paste0(output_path, "synG4_HMvLL_lyr_DEG.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == 1), file = paste0(output_path, "synG4_HMvLL_lyr_DEG_up.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(dplyr::filter(summary_lyr, dir == -1), file = paste0(output_path, "synG4_HMvLL_lyr_DEG_down.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
+
+```
