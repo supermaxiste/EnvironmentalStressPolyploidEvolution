@@ -8,13 +8,23 @@ library(data.table)
 library(DESeq2)
 library(ComplexHeatmap)
 
+## Paths to define
+
+# Paths to genome annotation files
+Ahal_anno_path <- c("path/to/anno_hal.gff")
+Alyr_anno_path <- c("path/to/anno_lyr.gff")
+# Path to file with low coverage genes
+low_coverage_genes <- c("path/to/downstream_analyses/main_results/data/Fig5a/")
+# Path to count tables (featureCounts output)
+count_tables <- c("path/to/count_tables_folder/")
+
 ## In the first part of the script we import
 ## the annotations to exclude genes falling
 ## into low coverage scaffolds
 
 # We import annotations to find the corresponding scaffold of DEGs
 
-Ahal_v2_2 <- read.delim("~/OneDrive/PostDoc/Ahal_genome_Dario/hal_r2_MAKER_32518.gff",
+Ahal_v2_2 <- read.delim(Ahal_anno_path,
                         header=FALSE,
                         col.names = c("chr",
                                       "tool", 
@@ -25,7 +35,7 @@ Ahal_v2_2 <- read.delim("~/OneDrive/PostDoc/Ahal_genome_Dario/hal_r2_MAKER_32518
                                       "strand", 
                                       "dot", 
                                       "extra"))
-Alyr_v2_2 <- read.delim("~/OneDrive/PostDoc/Alyr_genome_Dario/lyr_r2_MAKER_28737.gff", 
+Alyr_v2_2 <- read.delim(Alyr_anno_path, 
                         header=FALSE,
                         col.names = c("chr",
                                       "tool", 
@@ -63,11 +73,11 @@ Alyr_anno <- filter(Alyr_anno, context == "gene")
 
 # Import low coverage scaffolds
 
-HM_hal_lowC_genes  <- read.table("~/OneDrive/PhD/Project/Chapter_3/new_coverage_analysis/HM_lowC_genes_hal.txt", quote="\"", comment.char="")
-HM_lyr_lowC_genes  <- read.table("~/OneDrive/PhD/Project/Chapter_3/new_coverage_analysis/HM_lowC_genes_lyr.txt", quote="\"", comment.char="")
+HM_hal_lowC_genes  <- read.table(paste0(low_coverage_genes, "HM_lowC_genes_hal.txt"), quote="\"", comment.char="")
+HM_lyr_lowC_genes  <- read.table(paste0(low_coverage_genes, "HM_lowC_genes_lyr.txt"), quote="\"", comment.char="")
 
-LL_hal_lowC_genes  <- read.table("~/OneDrive/PhD/Project/Chapter_3/new_coverage_analysis/LL_lowC_genes_hal.txt", quote="\"", comment.char="")
-LL_lyr_lowC_genes  <- read.table("~/OneDrive/PhD/Project/Chapter_3/new_coverage_analysis/LL_lowC_genes_lyr.txt", quote="\"", comment.char="")
+LL_hal_lowC_genes  <- read.table(paste0(low_coverage_genes, "LL_lowC_genes_hal.txt"), quote="\"", comment.char="")
+LL_lyr_lowC_genes  <- read.table(paste0(low_coverage_genes, "LL_lowC_genes_lyr.txt"), quote="\"", comment.char="")
 
 # Extract geneID from extra column
 
@@ -100,240 +110,238 @@ filter_lyr_HM <- which(Alyr_anno$geneID %in%
 filter_lyr_LL <- which(Alyr_anno$geneID %in%
                          LL_lyr_lowC_genes$V1)
 
-## Import files
 
-# Path to count tables (featureCounts output)
+# Processing count tables 
 
-folder_path <- "~/OneDrive/PhD/Project/Chapter_3/Reports/count_tables/"
 colnames <- c("Geneid", "Chr", "Start", "End", "Strand", "Length", "Counts")
 
 
 # Read files (raw counts)
 
-HM_hal_G1_1 <- fread(paste0(folder_path, "HM_hal_G1_1_counts.txt"), 
+HM_hal_G1_1 <- fread(paste0(count_tables, "HM_hal_G1_1_counts.txt"), 
                      col.names = colnames)
-HM_hal_G1_2 <- fread(paste0(folder_path, "HM_hal_G1_2_counts.txt"), 
+HM_hal_G1_2 <- fread(paste0(count_tables, "HM_hal_G1_2_counts.txt"), 
                      col.names = colnames)
-HM_hal_G1_3 <- fread(paste0(folder_path, "HM_hal_G1_3_counts.txt"), 
+HM_hal_G1_3 <- fread(paste0(count_tables, "HM_hal_G1_3_counts.txt"), 
                      col.names = colnames)
-HM_hal_G1_4 <- fread(paste0(folder_path, "HM_hal_G1_4_counts.txt"), 
+HM_hal_G1_4 <- fread(paste0(count_tables, "HM_hal_G1_4_counts.txt"), 
                      col.names = colnames)
-HM_hal_G4_1 <- fread(paste0(folder_path, "HM_hal_G4_1_counts.txt"), 
+HM_hal_G4_1 <- fread(paste0(count_tables, "HM_hal_G4_1_counts.txt"), 
                      col.names = colnames)
-HM_hal_G4_2 <- fread(paste0(folder_path, "HM_hal_G4_2_counts.txt"), 
+HM_hal_G4_2 <- fread(paste0(count_tables, "HM_hal_G4_2_counts.txt"), 
                      col.names = colnames)
-HM_hal_G4_3 <- fread(paste0(folder_path, "HM_hal_G4_3_counts.txt"), 
+HM_hal_G4_3 <- fread(paste0(count_tables, "HM_hal_G4_3_counts.txt"), 
                      col.names = colnames)
-HM_lyr_G1_1 <- fread(paste0(folder_path, "HM_lyr_G1_1_counts.txt"), 
+HM_lyr_G1_1 <- fread(paste0(count_tables, "HM_lyr_G1_1_counts.txt"), 
                      col.names = colnames)
-HM_lyr_G1_2 <- fread(paste0(folder_path, "HM_lyr_G1_2_counts.txt"), 
+HM_lyr_G1_2 <- fread(paste0(count_tables, "HM_lyr_G1_2_counts.txt"), 
                      col.names = colnames)
-HM_lyr_G1_3 <- fread(paste0(folder_path, "HM_lyr_G1_3_counts.txt"), 
+HM_lyr_G1_3 <- fread(paste0(count_tables, "HM_lyr_G1_3_counts.txt"), 
                      col.names = colnames)
-HM_lyr_G1_4 <- fread(paste0(folder_path, "HM_lyr_G1_4_counts.txt"), 
+HM_lyr_G1_4 <- fread(paste0(count_tables, "HM_lyr_G1_4_counts.txt"), 
                      col.names = colnames)
-HM_lyr_G4_1 <- fread(paste0(folder_path, "HM_lyr_G4_1_counts.txt"), 
+HM_lyr_G4_1 <- fread(paste0(count_tables, "HM_lyr_G4_1_counts.txt"), 
                      col.names = colnames)
-HM_lyr_G4_2 <- fread(paste0(folder_path, "HM_lyr_G4_2_counts.txt"), 
+HM_lyr_G4_2 <- fread(paste0(count_tables, "HM_lyr_G4_2_counts.txt"), 
                      col.names = colnames)
-HM_lyr_G4_3 <- fread(paste0(folder_path, "HM_lyr_G4_3_counts.txt"), 
-                     col.names = colnames)
-
-HM_RS7_G1_1_hal <- fread(paste0(folder_path, "HM_RS7_G1_1_halcounts.txt"), 
-                         col.names = colnames)
-HM_RS7_G1_1_lyr <- fread(paste0(folder_path, "HM_RS7_G1_1_lyrcounts.txt"), 
-                         col.names = colnames)
-HM_RS7_G1_2_hal <- fread(paste0(folder_path, "HM_RS7_G1_2_halcounts.txt"), 
-                         col.names = colnames)
-HM_RS7_G1_2_lyr <- fread(paste0(folder_path, "HM_RS7_G1_2_lyrcounts.txt"), 
-                         col.names = colnames)
-HM_RS7_G1_3_hal <- fread(paste0(folder_path, "HM_RS7_G1_3_halcounts.txt"), 
-                         col.names = colnames)
-HM_RS7_G1_3_lyr <- fread(paste0(folder_path, "HM_RS7_G1_3_lyrcounts.txt"), 
-                         col.names = colnames)
-HM_RS7_G1_4_hal <- fread(paste0(folder_path, "HM_RS7_G1_4_halcounts.txt"), 
-                         col.names = colnames)
-HM_RS7_G1_4_lyr <- fread(paste0(folder_path, "HM_RS7_G1_4_lyrcounts.txt"), 
-                         col.names = colnames)
-
-HM_RS7_G4_1_hal <- fread(paste0(folder_path, "HM_RS7_G4_1_halcounts.txt"), 
-                         col.names = colnames)
-HM_RS7_G4_1_lyr <- fread(paste0(folder_path, "HM_RS7_G4_1_lyrcounts.txt"), 
-                         col.names = colnames)
-HM_RS7_G4_2_hal <- fread(paste0(folder_path, "HM_RS7_G4_2_halcounts.txt"), 
-                         col.names = colnames)
-HM_RS7_G4_2_lyr <- fread(paste0(folder_path, "HM_RS7_G4_2_lyrcounts.txt"), 
-                         col.names = colnames)
-
-HM_ALK_G1_1_hal <- fread(paste0(folder_path, "HM_ALK_G1_1_halcounts.txt"), 
-                         col.names = colnames)
-HM_ALK_G1_1_lyr <- fread(paste0(folder_path, "HM_ALK_G1_1_lyrcounts.txt"), 
-                         col.names = colnames)
-HM_ALK_G1_2_hal <- fread(paste0(folder_path, "HM_ALK_G1_2_halcounts.txt"), 
-                         col.names = colnames)
-HM_ALK_G1_2_lyr <- fread(paste0(folder_path, "HM_ALK_G1_2_lyrcounts.txt"), 
-                         col.names = colnames)
-HM_ALK_G1_3_hal <- fread(paste0(folder_path, "HM_ALK_G1_3_halcounts.txt"), 
-                         col.names = colnames)
-HM_ALK_G1_3_lyr <- fread(paste0(folder_path, "HM_ALK_G1_3_lyrcounts.txt"), 
-                         col.names = colnames)
-
-HM_ALK_G4_1_hal <- fread(paste0(folder_path, "HM_ALK_G4_1_halcounts.txt"), 
-                         col.names = colnames)
-HM_ALK_G4_1_lyr <- fread(paste0(folder_path, "HM_ALK_G4_1_lyrcounts.txt"), 
-                         col.names = colnames)
-HM_ALK_G4_2_hal <- fread(paste0(folder_path, "HM_ALK_G4_2_halcounts.txt"), 
-                         col.names = colnames)
-HM_ALK_G4_2_lyr <- fread(paste0(folder_path, "HM_ALK_G4_2_lyrcounts.txt"), 
-                         col.names = colnames)
-HM_ALK_G4_3_hal <- fread(paste0(folder_path, "HM_ALK_G4_3_halcounts.txt"), 
-                         col.names = colnames)
-HM_ALK_G4_3_lyr <- fread(paste0(folder_path, "HM_ALK_G4_3_lyrcounts.txt"), 
-                         col.names = colnames)
-
-HM_TKS_G1_1_hal <- fread(paste0(folder_path, "HM_TKS_G1_1_halcounts.txt"), 
-                         col.names = colnames)
-HM_TKS_G1_1_lyr <- fread(paste0(folder_path, "HM_TKS_G1_1_lyrcounts.txt"), 
-                         col.names = colnames)
-HM_TKS_G1_2_hal <- fread(paste0(folder_path, "HM_TKS_G1_2_halcounts.txt"), 
-                         col.names = colnames)
-HM_TKS_G1_2_lyr <- fread(paste0(folder_path, "HM_TKS_G1_2_lyrcounts.txt"), 
-                         col.names = colnames)
-HM_TKS_G1_3_hal <- fread(paste0(folder_path, "HM_TKS_G1_3_halcounts.txt"), 
-                         col.names = colnames)
-HM_TKS_G1_3_lyr <- fread(paste0(folder_path, "HM_TKS_G1_3_lyrcounts.txt"), 
-                         col.names = colnames)
-
-HM_TKS_G5_1_hal <- fread(paste0(folder_path, "HM_TKS_G5_1_halcounts.txt"), 
-                         col.names = colnames)
-HM_TKS_G5_1_lyr <- fread(paste0(folder_path, "HM_TKS_G5_1_lyrcounts.txt"), 
-                         col.names = colnames)
-HM_TKS_G5_2_hal <- fread(paste0(folder_path, "HM_TKS_G5_2_halcounts.txt"), 
-                         col.names = colnames)
-HM_TKS_G5_2_lyr <- fread(paste0(folder_path, "HM_TKS_G5_2_lyrcounts.txt"), 
-                         col.names = colnames)
-HM_TKS_G5_3_hal <- fread(paste0(folder_path, "HM_TKS_G5_3_halcounts.txt"), 
-                         col.names = colnames)
-HM_TKS_G5_3_lyr <- fread(paste0(folder_path, "HM_TKS_G5_3_lyrcounts.txt"), 
-                         col.names = colnames)
-
-
-LL_hal_G1_1 <- fread(paste0(folder_path, "LL_hal_G1_1_counts.txt"), 
-                     col.names = colnames)
-LL_hal_G1_2 <- fread(paste0(folder_path, "LL_hal_G1_2_counts.txt"), 
-                     col.names = colnames)
-LL_hal_G1_4 <- fread(paste0(folder_path, "LL_hal_G1_4_counts.txt"), 
-                     col.names = colnames)
-LL_hal_G1_5 <- fread(paste0(folder_path, "LL_hal_G1_5_counts.txt"), 
-                     col.names = colnames)
-LL_hal_G1_6 <- fread(paste0(folder_path, "LL_hal_G1_6_counts.txt"), 
-                     col.names = colnames)
-LL_hal_G4_1 <- fread(paste0(folder_path, "LL_hal_G4_1_counts.txt"), 
-                     col.names = colnames)
-LL_hal_G4_2 <- fread(paste0(folder_path, "LL_hal_G4_2_counts.txt"), 
+HM_lyr_G4_3 <- fread(paste0(count_tables, "HM_lyr_G4_3_counts.txt"), 
                      col.names = colnames)
 
-LL_lyr_G1_1 <- fread(paste0(folder_path, "LL_lyr_G1_1_counts.txt"), 
-                     col.names = colnames)
-LL_lyr_G1_2 <- fread(paste0(folder_path, "LL_lyr_G1_2_counts.txt"), 
-                     col.names = colnames)
-LL_lyr_G1_4 <- fread(paste0(folder_path, "LL_lyr_G1_4_counts.txt"), 
-                     col.names = colnames)
-LL_lyr_G1_5 <- fread(paste0(folder_path, "LL_lyr_G1_5_counts.txt"), 
-                     col.names = colnames)
-LL_lyr_G1_6 <- fread(paste0(folder_path, "LL_lyr_G1_6_counts.txt"), 
-                     col.names = colnames)
-LL_lyr_G4_1 <- fread(paste0(folder_path, "LL_lyr_G4_1_counts.txt"), 
-                     col.names = colnames)
-LL_lyr_G4_2 <- fread(paste0(folder_path, "LL_lyr_G4_2_counts.txt"), 
-                     col.names = colnames)
-LL_lyr_G4_3 <- fread(paste0(folder_path, "LL_lyr_G4_3_counts.txt"), 
-                     col.names = colnames)
-LL_lyr_G4_4 <- fread(paste0(folder_path, "LL_lyr_G4_4_counts.txt"), 
-                     col.names = colnames)
-LL_lyr_G4_5 <- fread(paste0(folder_path, "LL_lyr_G4_5_counts.txt"), 
-                     col.names = colnames)
-
-LL_RS7_G1_1_hal <- fread(paste0(folder_path, "LL_RS7_G1_1_halcounts.txt"), 
+HM_RS7_G1_1_hal <- fread(paste0(count_tables, "HM_RS7_G1_1_halcounts.txt"), 
                          col.names = colnames)
-LL_RS7_G1_1_lyr <- fread(paste0(folder_path, "LL_RS7_G1_1_lyrcounts.txt"), 
+HM_RS7_G1_1_lyr <- fread(paste0(count_tables, "HM_RS7_G1_1_lyrcounts.txt"), 
                          col.names = colnames)
-LL_RS7_G1_2_hal <- fread(paste0(folder_path, "LL_RS7_G1_2_halcounts.txt"), 
+HM_RS7_G1_2_hal <- fread(paste0(count_tables, "HM_RS7_G1_2_halcounts.txt"), 
                          col.names = colnames)
-LL_RS7_G1_2_lyr <- fread(paste0(folder_path, "LL_RS7_G1_2_lyrcounts.txt"), 
+HM_RS7_G1_2_lyr <- fread(paste0(count_tables, "HM_RS7_G1_2_lyrcounts.txt"), 
                          col.names = colnames)
-LL_RS7_G1_3_hal <- fread(paste0(folder_path, "LL_RS7_G1_3_halcounts.txt"), 
+HM_RS7_G1_3_hal <- fread(paste0(count_tables, "HM_RS7_G1_3_halcounts.txt"), 
                          col.names = colnames)
-LL_RS7_G1_3_lyr <- fread(paste0(folder_path, "LL_RS7_G1_3_lyrcounts.txt"), 
+HM_RS7_G1_3_lyr <- fread(paste0(count_tables, "HM_RS7_G1_3_lyrcounts.txt"), 
                          col.names = colnames)
-LL_RS7_G1_4_hal <- fread(paste0(folder_path, "LL_RS7_G1_4_halcounts.txt"), 
+HM_RS7_G1_4_hal <- fread(paste0(count_tables, "HM_RS7_G1_4_halcounts.txt"), 
                          col.names = colnames)
-LL_RS7_G1_4_lyr <- fread(paste0(folder_path, "LL_RS7_G1_4_lyrcounts.txt"), 
+HM_RS7_G1_4_lyr <- fread(paste0(count_tables, "HM_RS7_G1_4_lyrcounts.txt"), 
                          col.names = colnames)
 
-LL_RS7_G4_1_hal <- fread(paste0(folder_path, "LL_RS7_G4_1_halcounts.txt"), 
+HM_RS7_G4_1_hal <- fread(paste0(count_tables, "HM_RS7_G4_1_halcounts.txt"), 
                          col.names = colnames)
-LL_RS7_G4_1_lyr <- fread(paste0(folder_path, "LL_RS7_G4_1_lyrcounts.txt"), 
+HM_RS7_G4_1_lyr <- fread(paste0(count_tables, "HM_RS7_G4_1_lyrcounts.txt"), 
                          col.names = colnames)
-LL_RS7_G4_2_hal <- fread(paste0(folder_path, "LL_RS7_G4_2_halcounts.txt"), 
+HM_RS7_G4_2_hal <- fread(paste0(count_tables, "HM_RS7_G4_2_halcounts.txt"), 
                          col.names = colnames)
-LL_RS7_G4_2_lyr <- fread(paste0(folder_path, "LL_RS7_G4_2_lyrcounts.txt"), 
-                         col.names = colnames)
-LL_RS7_G4_3_hal <- fread(paste0(folder_path, "LL_RS7_G4_3_halcounts.txt"), 
-                         col.names = colnames)
-LL_RS7_G4_3_lyr <- fread(paste0(folder_path, "LL_RS7_G4_3_lyrcounts.txt"), 
+HM_RS7_G4_2_lyr <- fread(paste0(count_tables, "HM_RS7_G4_2_lyrcounts.txt"), 
                          col.names = colnames)
 
-LL_ALK_G1_1_hal <- fread(paste0(folder_path, "LL_ALK_G1_1_halcounts.txt"), 
+HM_ALK_G1_1_hal <- fread(paste0(count_tables, "HM_ALK_G1_1_halcounts.txt"), 
                          col.names = colnames)
-LL_ALK_G1_1_lyr <- fread(paste0(folder_path, "LL_ALK_G1_1_lyrcounts.txt"), 
+HM_ALK_G1_1_lyr <- fread(paste0(count_tables, "HM_ALK_G1_1_lyrcounts.txt"), 
                          col.names = colnames)
-LL_ALK_G1_2_hal <- fread(paste0(folder_path, "LL_ALK_G1_2_halcounts.txt"), 
+HM_ALK_G1_2_hal <- fread(paste0(count_tables, "HM_ALK_G1_2_halcounts.txt"), 
                          col.names = colnames)
-LL_ALK_G1_2_lyr <- fread(paste0(folder_path, "LL_ALK_G1_2_lyrcounts.txt"), 
+HM_ALK_G1_2_lyr <- fread(paste0(count_tables, "HM_ALK_G1_2_lyrcounts.txt"), 
                          col.names = colnames)
-LL_ALK_G1_3_hal <- fread(paste0(folder_path, "LL_ALK_G1_3_halcounts.txt"), 
+HM_ALK_G1_3_hal <- fread(paste0(count_tables, "HM_ALK_G1_3_halcounts.txt"), 
                          col.names = colnames)
-LL_ALK_G1_3_lyr <- fread(paste0(folder_path, "LL_ALK_G1_3_lyrcounts.txt"), 
-                         col.names = colnames)
-
-LL_ALK_G4_1_hal <- fread(paste0(folder_path, "LL_ALK_G4_1_halcounts.txt"), 
-                         col.names = colnames)
-LL_ALK_G4_1_lyr <- fread(paste0(folder_path, "LL_ALK_G4_1_lyrcounts.txt"), 
-                         col.names = colnames)
-LL_ALK_G4_2_hal <- fread(paste0(folder_path, "LL_ALK_G4_2_halcounts.txt"), 
-                         col.names = colnames)
-LL_ALK_G4_2_lyr <- fread(paste0(folder_path, "LL_ALK_G4_2_lyrcounts.txt"), 
-                         col.names = colnames)
-LL_ALK_G4_3_hal <- fread(paste0(folder_path, "LL_ALK_G4_3_halcounts.txt"), 
-                         col.names = colnames)
-LL_ALK_G4_3_lyr <- fread(paste0(folder_path, "LL_ALK_G4_3_lyrcounts.txt"), 
+HM_ALK_G1_3_lyr <- fread(paste0(count_tables, "HM_ALK_G1_3_lyrcounts.txt"), 
                          col.names = colnames)
 
-LL_TKS_G1_1_hal <- fread(paste0(folder_path, "LL_TKS_G1_1_halcounts.txt"), 
+HM_ALK_G4_1_hal <- fread(paste0(count_tables, "HM_ALK_G4_1_halcounts.txt"), 
                          col.names = colnames)
-LL_TKS_G1_1_lyr <- fread(paste0(folder_path, "LL_TKS_G1_1_lyrcounts.txt"), 
+HM_ALK_G4_1_lyr <- fread(paste0(count_tables, "HM_ALK_G4_1_lyrcounts.txt"), 
                          col.names = colnames)
-LL_TKS_G1_2_hal <- fread(paste0(folder_path, "LL_TKS_G1_2_halcounts.txt"), 
+HM_ALK_G4_2_hal <- fread(paste0(count_tables, "HM_ALK_G4_2_halcounts.txt"), 
                          col.names = colnames)
-LL_TKS_G1_2_lyr <- fread(paste0(folder_path, "LL_TKS_G1_2_lyrcounts.txt"), 
+HM_ALK_G4_2_lyr <- fread(paste0(count_tables, "HM_ALK_G4_2_lyrcounts.txt"), 
                          col.names = colnames)
-LL_TKS_G1_3_hal <- fread(paste0(folder_path, "LL_TKS_G1_3_halcounts.txt"), 
+HM_ALK_G4_3_hal <- fread(paste0(count_tables, "HM_ALK_G4_3_halcounts.txt"), 
                          col.names = colnames)
-LL_TKS_G1_3_lyr <- fread(paste0(folder_path, "LL_TKS_G1_3_lyrcounts.txt"), 
+HM_ALK_G4_3_lyr <- fread(paste0(count_tables, "HM_ALK_G4_3_lyrcounts.txt"), 
                          col.names = colnames)
 
-LL_TKS_G5_1_hal <- fread(paste0(folder_path, "LL_TKS_G5_1_halcounts.txt"), 
+HM_TKS_G1_1_hal <- fread(paste0(count_tables, "HM_TKS_G1_1_halcounts.txt"), 
                          col.names = colnames)
-LL_TKS_G5_1_lyr <- fread(paste0(folder_path, "LL_TKS_G5_1_lyrcounts.txt"), 
+HM_TKS_G1_1_lyr <- fread(paste0(count_tables, "HM_TKS_G1_1_lyrcounts.txt"), 
                          col.names = colnames)
-LL_TKS_G5_2_hal <- fread(paste0(folder_path, "LL_TKS_G5_2_halcounts.txt"), 
+HM_TKS_G1_2_hal <- fread(paste0(count_tables, "HM_TKS_G1_2_halcounts.txt"), 
                          col.names = colnames)
-LL_TKS_G5_2_lyr <- fread(paste0(folder_path, "LL_TKS_G5_2_lyrcounts.txt"), 
+HM_TKS_G1_2_lyr <- fread(paste0(count_tables, "HM_TKS_G1_2_lyrcounts.txt"), 
                          col.names = colnames)
-LL_TKS_G5_3_hal <- fread(paste0(folder_path, "LL_TKS_G5_3_halcounts.txt"), 
+HM_TKS_G1_3_hal <- fread(paste0(count_tables, "HM_TKS_G1_3_halcounts.txt"), 
                          col.names = colnames)
-LL_TKS_G5_3_lyr <- fread(paste0(folder_path, "LL_TKS_G5_3_lyrcounts.txt"), 
+HM_TKS_G1_3_lyr <- fread(paste0(count_tables, "HM_TKS_G1_3_lyrcounts.txt"), 
+                         col.names = colnames)
+
+HM_TKS_G5_1_hal <- fread(paste0(count_tables, "HM_TKS_G5_1_halcounts.txt"), 
+                         col.names = colnames)
+HM_TKS_G5_1_lyr <- fread(paste0(count_tables, "HM_TKS_G5_1_lyrcounts.txt"), 
+                         col.names = colnames)
+HM_TKS_G5_2_hal <- fread(paste0(count_tables, "HM_TKS_G5_2_halcounts.txt"), 
+                         col.names = colnames)
+HM_TKS_G5_2_lyr <- fread(paste0(count_tables, "HM_TKS_G5_2_lyrcounts.txt"), 
+                         col.names = colnames)
+HM_TKS_G5_3_hal <- fread(paste0(count_tables, "HM_TKS_G5_3_halcounts.txt"), 
+                         col.names = colnames)
+HM_TKS_G5_3_lyr <- fread(paste0(count_tables, "HM_TKS_G5_3_lyrcounts.txt"), 
+                         col.names = colnames)
+
+
+LL_hal_G1_1 <- fread(paste0(count_tables, "LL_hal_G1_1_counts.txt"), 
+                     col.names = colnames)
+LL_hal_G1_2 <- fread(paste0(count_tables, "LL_hal_G1_2_counts.txt"), 
+                     col.names = colnames)
+LL_hal_G1_4 <- fread(paste0(count_tables, "LL_hal_G1_4_counts.txt"), 
+                     col.names = colnames)
+LL_hal_G1_5 <- fread(paste0(count_tables, "LL_hal_G1_5_counts.txt"), 
+                     col.names = colnames)
+LL_hal_G1_6 <- fread(paste0(count_tables, "LL_hal_G1_6_counts.txt"), 
+                     col.names = colnames)
+LL_hal_G4_1 <- fread(paste0(count_tables, "LL_hal_G4_1_counts.txt"), 
+                     col.names = colnames)
+LL_hal_G4_2 <- fread(paste0(count_tables, "LL_hal_G4_2_counts.txt"), 
+                     col.names = colnames)
+
+LL_lyr_G1_1 <- fread(paste0(count_tables, "LL_lyr_G1_1_counts.txt"), 
+                     col.names = colnames)
+LL_lyr_G1_2 <- fread(paste0(count_tables, "LL_lyr_G1_2_counts.txt"), 
+                     col.names = colnames)
+LL_lyr_G1_4 <- fread(paste0(count_tables, "LL_lyr_G1_4_counts.txt"), 
+                     col.names = colnames)
+LL_lyr_G1_5 <- fread(paste0(count_tables, "LL_lyr_G1_5_counts.txt"), 
+                     col.names = colnames)
+LL_lyr_G1_6 <- fread(paste0(count_tables, "LL_lyr_G1_6_counts.txt"), 
+                     col.names = colnames)
+LL_lyr_G4_1 <- fread(paste0(count_tables, "LL_lyr_G4_1_counts.txt"), 
+                     col.names = colnames)
+LL_lyr_G4_2 <- fread(paste0(count_tables, "LL_lyr_G4_2_counts.txt"), 
+                     col.names = colnames)
+LL_lyr_G4_3 <- fread(paste0(count_tables, "LL_lyr_G4_3_counts.txt"), 
+                     col.names = colnames)
+LL_lyr_G4_4 <- fread(paste0(count_tables, "LL_lyr_G4_4_counts.txt"), 
+                     col.names = colnames)
+LL_lyr_G4_5 <- fread(paste0(count_tables, "LL_lyr_G4_5_counts.txt"), 
+                     col.names = colnames)
+
+LL_RS7_G1_1_hal <- fread(paste0(count_tables, "LL_RS7_G1_1_halcounts.txt"), 
+                         col.names = colnames)
+LL_RS7_G1_1_lyr <- fread(paste0(count_tables, "LL_RS7_G1_1_lyrcounts.txt"), 
+                         col.names = colnames)
+LL_RS7_G1_2_hal <- fread(paste0(count_tables, "LL_RS7_G1_2_halcounts.txt"), 
+                         col.names = colnames)
+LL_RS7_G1_2_lyr <- fread(paste0(count_tables, "LL_RS7_G1_2_lyrcounts.txt"), 
+                         col.names = colnames)
+LL_RS7_G1_3_hal <- fread(paste0(count_tables, "LL_RS7_G1_3_halcounts.txt"), 
+                         col.names = colnames)
+LL_RS7_G1_3_lyr <- fread(paste0(count_tables, "LL_RS7_G1_3_lyrcounts.txt"), 
+                         col.names = colnames)
+LL_RS7_G1_4_hal <- fread(paste0(count_tables, "LL_RS7_G1_4_halcounts.txt"), 
+                         col.names = colnames)
+LL_RS7_G1_4_lyr <- fread(paste0(count_tables, "LL_RS7_G1_4_lyrcounts.txt"), 
+                         col.names = colnames)
+
+LL_RS7_G4_1_hal <- fread(paste0(count_tables, "LL_RS7_G4_1_halcounts.txt"), 
+                         col.names = colnames)
+LL_RS7_G4_1_lyr <- fread(paste0(count_tables, "LL_RS7_G4_1_lyrcounts.txt"), 
+                         col.names = colnames)
+LL_RS7_G4_2_hal <- fread(paste0(count_tables, "LL_RS7_G4_2_halcounts.txt"), 
+                         col.names = colnames)
+LL_RS7_G4_2_lyr <- fread(paste0(count_tables, "LL_RS7_G4_2_lyrcounts.txt"), 
+                         col.names = colnames)
+LL_RS7_G4_3_hal <- fread(paste0(count_tables, "LL_RS7_G4_3_halcounts.txt"), 
+                         col.names = colnames)
+LL_RS7_G4_3_lyr <- fread(paste0(count_tables, "LL_RS7_G4_3_lyrcounts.txt"), 
+                         col.names = colnames)
+
+LL_ALK_G1_1_hal <- fread(paste0(count_tables, "LL_ALK_G1_1_halcounts.txt"), 
+                         col.names = colnames)
+LL_ALK_G1_1_lyr <- fread(paste0(count_tables, "LL_ALK_G1_1_lyrcounts.txt"), 
+                         col.names = colnames)
+LL_ALK_G1_2_hal <- fread(paste0(count_tables, "LL_ALK_G1_2_halcounts.txt"), 
+                         col.names = colnames)
+LL_ALK_G1_2_lyr <- fread(paste0(count_tables, "LL_ALK_G1_2_lyrcounts.txt"), 
+                         col.names = colnames)
+LL_ALK_G1_3_hal <- fread(paste0(count_tables, "LL_ALK_G1_3_halcounts.txt"), 
+                         col.names = colnames)
+LL_ALK_G1_3_lyr <- fread(paste0(count_tables, "LL_ALK_G1_3_lyrcounts.txt"), 
+                         col.names = colnames)
+
+LL_ALK_G4_1_hal <- fread(paste0(count_tables, "LL_ALK_G4_1_halcounts.txt"), 
+                         col.names = colnames)
+LL_ALK_G4_1_lyr <- fread(paste0(count_tables, "LL_ALK_G4_1_lyrcounts.txt"), 
+                         col.names = colnames)
+LL_ALK_G4_2_hal <- fread(paste0(count_tables, "LL_ALK_G4_2_halcounts.txt"), 
+                         col.names = colnames)
+LL_ALK_G4_2_lyr <- fread(paste0(count_tables, "LL_ALK_G4_2_lyrcounts.txt"), 
+                         col.names = colnames)
+LL_ALK_G4_3_hal <- fread(paste0(count_tables, "LL_ALK_G4_3_halcounts.txt"), 
+                         col.names = colnames)
+LL_ALK_G4_3_lyr <- fread(paste0(count_tables, "LL_ALK_G4_3_lyrcounts.txt"), 
+                         col.names = colnames)
+
+LL_TKS_G1_1_hal <- fread(paste0(count_tables, "LL_TKS_G1_1_halcounts.txt"), 
+                         col.names = colnames)
+LL_TKS_G1_1_lyr <- fread(paste0(count_tables, "LL_TKS_G1_1_lyrcounts.txt"), 
+                         col.names = colnames)
+LL_TKS_G1_2_hal <- fread(paste0(count_tables, "LL_TKS_G1_2_halcounts.txt"), 
+                         col.names = colnames)
+LL_TKS_G1_2_lyr <- fread(paste0(count_tables, "LL_TKS_G1_2_lyrcounts.txt"), 
+                         col.names = colnames)
+LL_TKS_G1_3_hal <- fread(paste0(count_tables, "LL_TKS_G1_3_halcounts.txt"), 
+                         col.names = colnames)
+LL_TKS_G1_3_lyr <- fread(paste0(count_tables, "LL_TKS_G1_3_lyrcounts.txt"), 
+                         col.names = colnames)
+
+LL_TKS_G5_1_hal <- fread(paste0(count_tables, "LL_TKS_G5_1_halcounts.txt"), 
+                         col.names = colnames)
+LL_TKS_G5_1_lyr <- fread(paste0(count_tables, "LL_TKS_G5_1_lyrcounts.txt"), 
+                         col.names = colnames)
+LL_TKS_G5_2_hal <- fread(paste0(count_tables, "LL_TKS_G5_2_halcounts.txt"), 
+                         col.names = colnames)
+LL_TKS_G5_2_lyr <- fread(paste0(count_tables, "LL_TKS_G5_2_lyrcounts.txt"), 
+                         col.names = colnames)
+LL_TKS_G5_3_hal <- fread(paste0(count_tables, "LL_TKS_G5_3_halcounts.txt"), 
+                         col.names = colnames)
+LL_TKS_G5_3_lyr <- fread(paste0(count_tables, "LL_TKS_G5_3_lyrcounts.txt"), 
                          col.names = colnames)
 
 ## We create a data frame with all raw counts,
