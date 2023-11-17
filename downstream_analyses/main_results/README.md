@@ -89,8 +89,15 @@ Details: the script changes working directory 12 times, one for each of the outp
 
 Package requirements: `tidyverse`, `data.table`, `DESeq2` and `ComplexHeatmap`  
 Script: `Fig5a_ExpressionHeatmaps.R`  
-Data: `data/Fig5a`, classical genome annotation files from TBD and count tables from TBD
+Data: `data/Fig5a`, classical genome annotation files from TBD and count tables from TBD   
 Details: the script requires to define paths in L13-19 for the annotations, count tables and data from `data/Fig5a`.
+
+### Figure 5bcd
+
+Package requirements: `tidyverse` and `patchwork` 
+Script: `Fig5bcd_DEGBarplots.R`  
+Data: `data/Fig5a` and files with differentially expressed genes from TBD   
+Details: the script requires to define paths in L11-14 for the folder with DEG files and data from `data/Fig5a`.
 
 ## Figure 6
 
