@@ -2,7 +2,7 @@
 
 Here you will find 24 folders for all 24 comparisons ran with ARPEGGIO to compare DNA methylation patterns together with a summary on data quality. To navigate the folders use the following legend:
 
- - `HOT` and `COLD` refer to the two conditions in which plants were grown
+ - `MILD` and `STRESS` refer to the two conditions in which plants were grown
 
  - `1`, `4` and `5` represent the generation of a given group of plants
 
@@ -12,7 +12,22 @@ Here you will find 24 folders for all 24 comparisons ran with ARPEGGIO to compar
 
  - `alk` and `tks` are two natural lines of _A. kamchatica_. `alk` is short for Alaska and `tks` is short for Takashima. The Alaska line is useed to colder conditions while Takashima is used to warmer conditions.
  
-In each comparison folder you will find the specific `config.yaml` and `metadata.txt` files used together with a `README` including links to the specific raw data used. All of the links can also be found below. All data is bundled in [BioProject PRJDB12567](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJDB12567)
+In each comparison folder you will find the specific `config.yaml` and `metadata.txt` files used together with a `README` including links to the specific raw data used. All of the links can also be found below. All data is bundled in [BioProject PRJDB12567](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJDB12567).
+
+## About `config.yaml` files
+
+In short, parameters with paths require changes to the local system and for details about assemblies and annotations used, see the following paragraph.  
+
+Conversion checks were carried out using the *Arabidopsis halleri* chloroplast genome (GenBank: KU764767.1, [NCBI link](https://www.ncbi.nlm.nih.gov/nuccore/KU764767.1/)) from [Assaf *et al.* (2017)](https://doi.org/10.1038/s41598-017-07891-5).  
+Alignment was done used pre-processed assemblies:
+
+  - For *Arabidopsis halleri* only the 8 main chromosomes were kept and renamed `chr1`-`chr8`
+  - For *Arabidopsis lyrata* only the 8 main chromosomes were kept and renamed `chr9`-`chr16` (ARPEGGIO requirement to not have overlapping chromosome names)
+
+Concerning the annotations of the above mentioned assemblies during the analyses for the paper:
+
+  - For *Arabidopsis halleri* the annotation chromosomes were renamed `chr1`-`chr8`. Since the annotation was very recently made at the time of the analyses, the defult gene names were pretty long and not matching the official "released" version. The analyses are still reproducible but there might be a name mismatch between results presented in this repository and reproduced ones.
+  - For *Arabidopsis lyrata* the annotation chromosomes were renamed `chr9`-`chr16`
  
 ### Cold conditions
 
