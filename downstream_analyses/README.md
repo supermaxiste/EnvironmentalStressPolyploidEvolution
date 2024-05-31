@@ -8,4 +8,4 @@ Here you will find four folders that contain the following:
 
  - `supplementary_material` includes all scripts and files required to obtain supplementary plots or tables. 
 
-- 'synteny_analysis' includes all scripts and files required to obtain synteny plots.
+- `synteny_analysis` includes all scripts and files required to obtain synteny plots.
