@@ -34,9 +34,9 @@ Details: To find out how to obtain the data used, refer to the `METHImpute_analy
 
 ### Figure 2c
 
-Package requirements: `tidyverse`, `data.table` and `patchwork`  
-Script: `Fig2b_DotplotGlobalMethylationLevel.R`  
-Data: `data/Fig2b`  
+Package requirements: `tidyverse`, `data.table`, `scales` and `patchwork`  
+Script: `Fig2c_enrichmentPlot.R`  
+Data: `data/Fig2c`  
 Details: To find out how to obtain the data used, refer to the `METHImpute_analyses` folder from the main repository ([direct link](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/METHImpute_analyses)).
 
 ## Figure 4
