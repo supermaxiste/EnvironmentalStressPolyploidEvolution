@@ -2,7 +2,7 @@
 
 This repository contains all the scripts associated to the paper:
 
-*Environmental stress contributes to diverging DNA methylation and expression response in early stages of polyploidy*, _Milosavljevic_ et al. (2023)
+*Convergence and divergence of DNA methylation and gene expression patterns in neopolyploid of Arabidopsis kamchatica*, _Milosavljevic_ et al. (2025)
 
 Each folder includes different stages and output of the analyses:
 
@@ -13,9 +13,3 @@ Each folder includes different stages and output of the analyses:
    - **RNAseq**: includes all scripts and files related to the full RNAseq data analysis workflow.
 
    - **downstream_analyses** includes all the scripts used for main and supplementary results (plots included).
-
-
-   
-## General resources
-
-
