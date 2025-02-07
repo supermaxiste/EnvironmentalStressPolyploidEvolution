@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.path = "RNAplots/",
                       dev = c("png"),
                       dpi=600)
-output_path <- c("~/OneDrive/PhD/Project/Chapter_3/Reports/RNAseqDEG_v2/")
+output_path <- c("/path/to/data/output")
 ```
 
 ## Background
@@ -38,11 +38,11 @@ library(ggplot2)
 
 # import low coverage genes list
 
-HM_lowC_genes_hal <- read.table("~/data/FigS6-7/HM_lowC_genes_hal.txt", quote="\"", comment.char="")
-HM_lowC_genes_lyr <- read.table("~/data/FigS6-7/HM_lowC_genes_lyr.txt", quote="\"", comment.char="")
+HM_lowC_genes_hal <- read.table("HM_lowC_genes_hal.txt", quote="\"", comment.char="")
+HM_lowC_genes_lyr <- read.table("HM_lowC_genes_lyr.txt", quote="\"", comment.char="")
 
-LL_lowC_genes_hal <- read.table("~/data/FigS6-7/LL_lowC_genes_hal.txt", quote="\"", comment.char="")
-LL_lowC_genes_lyr <- read.table("~/data/FigS6-7/LL_lowC_genes_lyr.txt", quote="\"", comment.char="")
+LL_lowC_genes_hal <- read.table("LL_lowC_genes_hal.txt", quote="\"", comment.char="")
+LL_lowC_genes_lyr <- read.table("LL_lowC_genes_lyr.txt", quote="\"", comment.char="")
 
 # Create new column names to fix last column name
 colnames <- c("Geneid", "Chr", "Start", "End", "Strand", "Length", "Counts")

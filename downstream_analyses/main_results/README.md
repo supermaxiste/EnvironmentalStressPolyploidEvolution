@@ -110,7 +110,10 @@ Details: the script changes working directory 4 times, one for each of the outpu
 
 ### Figure 6a
 
-
+Package requirements: `edgeR`, `data.table` and `ggplot2`  
+Script: `RNAseq_edgeR_fullReport.Rmd`  
+Data: output counts from the [RNAseq analyses](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/RNAseq)  
+Details: the easiest way to run this R Markdown file is to do so interactively. L17, L41-45 and L53 require to set paths to the required files.  
 
 ### Figure 6bcde
 
