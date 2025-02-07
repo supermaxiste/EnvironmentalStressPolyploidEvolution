@@ -91,13 +91,6 @@ Data: 500bp promoter annotation files in `data/Fig5`, classical genome annotatio
 Details: the script changes working directory 4 times, one for each of the outputs outlined above and requires 4 paths: 2 for annotations in `data/Fig3c` and 2 for the classical annotations. Make sure to set the correct paths for lines 24, 30, 208, 220, 723, 743, 777, 797.
 
 
-### Figure 5a
-
-Package requirements: `tidyverse`, `data.table`, `DESeq2` and `ComplexHeatmap`  
-Script: `Fig5a_ExpressionHeatmaps.R`  
-Data: `data/Fig5a`, classical genome annotation files from TBD and count tables from TBD   
-Details: the script requires to define paths in L13-19 for the annotations, count tables and data from `data/Fig5a`.
-
 ### Figure 5bcd
 
 Package requirements: `tidyverse` and `patchwork` 
@@ -108,3 +101,10 @@ Details: the script requires to define paths in L11-14 for the folder with DEG f
 ## Figure 6
 
 TBD
+
+### Figure 7
+
+Package requirements: `tidyverse`, `data.table`, `DESeq2` and `ComplexHeatmap`  
+Script: `Fig7_ExpressionHeatmaps.R`  
+Data: `data/Fig7`, classical genome annotation files from TBD and count tables from TBD   
+Details: the script requires to define paths in L13-19 for the annotations, count tables and data from `data/Fig7`.
