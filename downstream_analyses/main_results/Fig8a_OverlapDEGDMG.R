@@ -16,7 +16,7 @@ library(svglite)
 
 ### Import methylation data
 
-setwd("~/Library/CloudStorage/OneDrive-Personal/PostDoc/Chapter2_3_manuscript/EnvironmentalStressPolyploidEvolution/downstream_analyses/main_results/data/Fig6a/")
+setwd("downstream_analyses/main_results/data/Fig8a/")
 
 # Cold conditions (HM)
 
@@ -181,7 +181,7 @@ LL_TKSG1_v_RS7G4_DMG_CHH_lyr <- read.delim("STRESS_tks1_v_syn4/dmrseq/CHH_contex
 
 # Import file with low coverage genes
 
-setwd("~/Library/CloudStorage/OneDrive-Personal/PostDoc/Chapter2_3_manuscript/EnvironmentalStressPolyploidEvolution/downstream_analyses/main_results/data/Fig5a/")
+setwd("downstream_analyses/main_results/data/Fig5a/")
 
 HM_hal_lowC_genes  <- read.delim("HM_lowC_genes_hal.txt", header = FALSE)
 HM_lyr_lowC_genes  <- read.table("HM_lowC_genes_lyr.txt", quote="\"", comment.char="")
@@ -1415,7 +1415,7 @@ ggsave(venn_LL_lyr1Vsyn4_DEG_v_DMG,
 
 
 
-## Other things below
+## Other things below - detailed numbers for further insights
 
 ## Checking overlap across generations for DEGs and DMGs
 
@@ -1551,7 +1551,7 @@ paste0(round(LL_TKSvsyn1syn4_lyrDMG/length(LL_TKSG1_v_RS7G1_DMG_lyr$geneID)*100,
 
 # output overlaps
 
-setwd("~/OneDrive/PostDoc/Chapter2_3_manuscript/EnvironmentalStressPolyploidEvolution/downstream_analyses/main_results/data/Fig6b")
+setwd("downstream_analyses/main_results/data/Fig8a")
 
 write.table(data.frame(geneID=intersect(HM_halG1_v_RS7G1_DEG$geneID,
                       HM_halG1_v_RS7G1_DMG$geneID)),
