@@ -98,31 +98,27 @@ Details: L15 path to `MILD_alk1_v_alk4` output, L159 path to `STRESS_alk1_v_alk4
 
 Package requirements: `grid`, `gridExtra`, `tidyverse`, `data.table`, `GenomicRanges` and `patchwork`  
 Script: `Fig5_DonutPlot.R`.  
-Data: 500bp promoter annotation files in `data/Fig5`, classical genome annotation files from TBD and the same `drmseq` output data for `Fig3b`:  
+Data: 500bp promoter annotation files in `data/Fig5`, classical genome annotation files from TBD and the same `drmseq` output `dmrseq` data in `data/Fig6a`:  
   - [MILD_syn1_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_syn1_v_pro1)
   - [MILD_syn4_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_syn4_v_pro1)
   - [STRESS_syn1_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_syn1_v_pro1)
   - [STRESS_syn4_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_syn4_v_pro1)   
-Details: the script changes working directory 4 times, one for each of the outputs outlined above and requires 4 paths: 2 for annotations in `data/Fig3c` and 2 for the classical annotations. Make sure to set the correct paths for lines 24, 30, 208, 220, 723, 743, 777, 797.
+Details: the script changes working directory 4 times, one for each of the outputs outlined above and requires 4 paths: 2 for annotations in `data/Fig5` and 2 for the classical annotations. Make sure to set the correct paths for lines 24, 30, 208, 220, 723, 743, 777, 797.
 
-
-### Figure 5bcd
-
-Package requirements: `tidyverse` and `patchwork` 
-Script: `Fig5bcd_DEGBarplots.R`  
-Data: `data/Fig5a` and files with differentially expressed genes from TBD   
-Details: the script requires to define paths in L11-14 for the folder with DEG files and data from `data/Fig5a`.
 
 ## Figure 6
 
 ### Figure 6a
 
-Package requirements: `tidyverse`, `patchwork` , `VennDiagram`, `ggVennDiagram`, `RColorBrewer` and `svglite`
-Script: `Fig8a_OverlapDEGDMG.R`  
-Data: `data/Fig8a`
-Details: L19 set path to `data/Fig8a`, L184 and L457 requires low coverage genes and expression data obtained from `downstream_analyses/supplementary_results/RNAseq_edgeR_fullReport.Rmd`. L802 L1554 require setting the output folder for the output figures.
 
-TBD
+
+### Figure 6bcde
+
+Package requirements: `tidyverse` and `patchwork` 
+Script: `Fig6bcde_DEGBarplots.R`  
+Data: expression and low coverage genes data obtained from `downstream_analyses/supplementary_results/RNAseq_edgeR_fullReport.Rmd`    
+Details: the script requires to define paths in L11-14 for low coverage genes and expression data obtained from `downstream_analyses/supplementary_results/RNAseq_edgeR_fullReport.Rmd`.  
+
 
 ## Figure 7
 
