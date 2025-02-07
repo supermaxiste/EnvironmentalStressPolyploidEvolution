@@ -1,0 +1,6 @@
+geneID	seqname	start	end	region_start	region_end	overlap_length	methylation_status
+augustus_masked-chr8-processed-gene-27.12	chr8	2744514	2745329	2745154	2746064	175	increase
+maker-chr8-augustus-gene-27.6	chr8	2743821	2748658	2745154	2746064	910	increase
+augustus_masked-chr5-processed-gene-29.10	chr5	2951534	2955710	2952402	2953139	737	decrease
+maker-chr3-augustus-gene-65.43	chr3	6574427	6579768	6577821	6578426	605	decrease
+maker-chr6-augustus-gene-86.0	chr6	8598183	8601187	8600334	8600840	506	increase

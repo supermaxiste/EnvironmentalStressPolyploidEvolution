@@ -1,0 +1,38 @@
+GO.ID	Term	Annotated	Significant	Expected	elimFisher
+GO:0006094	gluconeogenesis	21	3	0.38	0.0061
+GO:0110096	cellular response to aldehyde	10	2	0.18	0.0133
+GO:0044070	regulation of monoatomic anion transport	11	2	0.2	0.0160
+GO:0032412	regulation of monoatomic ion transmembrane transporter activity	11	2	0.2	0.0160
+GO:0022898	regulation of transmembrane transporter activity	11	2	0.2	0.0160
+GO:0006535	cysteine biosynthetic process from serine	12	2	0.22	0.0190
+GO:0006757	ATP generation from ADP	59	4	1.06	0.0217
+GO:0006096	glycolytic process	59	4	1.06	0.0217
+GO:0046031	ADP metabolic process	59	4	1.06	0.0217
+GO:0032409	regulation of transporter activity	13	2	0.23	0.0222
+GO:0009179	purine ribonucleoside diphosphate metabolic process	62	4	1.12	0.0255
+GO:0009135	purine nucleoside diphosphate metabolic process	62	4	1.12	0.0255
+GO:0006188	IMP biosynthetic process	14	2	0.25	0.0256
+GO:0046939	nucleotide phosphorylation	63	4	1.14	0.0268
+GO:0006165	nucleoside diphosphate phosphorylation	63	4	1.14	0.0268
+GO:0009185	ribonucleoside diphosphate metabolic process	64	4	1.15	0.0282
+GO:0009150	purine ribonucleotide metabolic process	163	7	2.94	0.0283
+GO:0046040	IMP metabolic process	15	2	0.27	0.0291
+GO:0016114	terpenoid biosynthetic process	97	5	1.75	0.0309
+GO:0046185	aldehyde catabolic process	16	2	0.29	0.0329
+GO:0016131	brassinosteroid metabolic process	17	2	0.31	0.0369
+GO:0098781	ncRNA transcription	17	2	0.31	0.0369
+GO:0072659	protein localization to plasma membrane	17	2	0.31	0.0369
+GO:1990110	callus formation	17	2	0.31	0.0369
+GO:0051346	negative regulation of hydrolase activity	17	2	0.31	0.0369
+GO:0016128	phytosteroid metabolic process	17	2	0.31	0.0369
+GO:0006163	purine nucleotide metabolic process	214	8	3.86	0.0403
+GO:0019321	pentose metabolic process	18	2	0.32	0.0410
+GO:0006525	arginine metabolic process	18	2	0.32	0.0410
+GO:0042060	wound healing	18	2	0.32	0.0410
+GO:0098656	monoatomic anion transmembrane transport	43	3	0.78	0.0421
+GO:0009132	nucleoside diphosphate metabolic process	73	4	1.32	0.0427
+GO:0009640	photomorphogenesis	75	4	1.35	0.0464
+GO:0009259	ribonucleotide metabolic process	182	7	3.28	0.0469
+GO:1990748	cellular detoxification	110	5	1.98	0.0488
+GO:1990778	protein localization to cell periphery	20	2	0.36	0.0497
+GO:0019432	triglyceride biosynthetic process	20	2	0.36	0.0497

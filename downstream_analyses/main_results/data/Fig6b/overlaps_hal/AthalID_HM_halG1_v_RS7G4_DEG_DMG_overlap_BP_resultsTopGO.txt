@@ -1,0 +1,74 @@
+GO.ID	Term	Annotated	Significant	Expected	elimFisher
+GO:0006882	intracellular zinc ion homeostasis	10	3	0.25	0.0017
+GO:0006778	porphyrin-containing compound metabolic process	90	8	2.29	0.0020
+GO:0044070	regulation of monoatomic anion transport	11	3	0.28	0.0023
+GO:0032412	regulation of monoatomic ion transmembrane transporter activity	11	3	0.28	0.0023
+GO:0009311	oligosaccharide metabolic process	77	7	1.96	0.0034
+GO:0000096	sulfur amino acid metabolic process	59	6	1.5	0.0038
+GO:0055062	phosphate ion homeostasis	13	3	0.33	0.0039
+GO:0098656	monoatomic anion transmembrane transport	43	5	1.09	0.0045
+GO:0044272	sulfur compound biosynthetic process	126	9	3.21	0.0049
+GO:0033014	tetrapyrrole biosynthetic process	67	6	1.7	0.0070
+GO:1902600	proton transmembrane transport	89	7	2.26	0.0075
+GO:0034030	ribonucleoside bisphosphate biosynthetic process	31	4	0.79	0.0075
+GO:0034033	purine nucleoside bisphosphate biosynthetic process	31	4	0.79	0.0075
+GO:0034605	cellular response to heat	53	5	1.35	0.0109
+GO:0016052	carbohydrate catabolic process	196	11	4.99	0.0117
+GO:0008652	amino acid biosynthetic process	173	10	4.4	0.0131
+GO:1901607	alpha-amino acid biosynthetic process	148	9	3.77	0.0134
+GO:0071616	acyl-CoA biosynthetic process	20	3	0.51	0.0135
+GO:0035384	thioester biosynthetic process	20	3	0.51	0.0135
+GO:0005984	disaccharide metabolic process	57	5	1.45	0.0147
+GO:0010038	response to metal ion	151	9	3.84	0.0151
+GO:0005985	sucrose metabolic process	38	4	0.97	0.0154
+GO:0044262	cellular carbohydrate metabolic process	351	16	8.93	0.0178
+GO:1901575	organic substance catabolic process	1156	41	29.42	0.0181
+GO:0070588	calcium ion transmembrane transport	61	5	1.55	0.0193
+GO:0071483	cellular response to blue light	23	3	0.59	0.0198
+GO:0000097	sulfur amino acid biosynthetic process	42	4	1.07	0.0216
+GO:0042168	heme metabolic process	24	3	0.61	0.0222
+GO:0006816	calcium ion transport	64	5	1.63	0.0232
+GO:0006779	porphyrin-containing compound biosynthetic process	64	5	1.63	0.0232
+GO:0042440	pigment metabolic process	164	9	4.17	0.0244
+GO:0045037	protein import into chloroplast stroma	25	3	0.64	0.0248
+GO:0002182	cytoplasmic translational elongation	10	2	0.25	0.0254
+GO:0034508	centromere complex assembly	10	2	0.25	0.0254
+GO:0016310	phosphorylation	1050	37	26.72	0.0265
+GO:0050896	response to stimulus	4107	121	104.51	0.0274
+GO:0010305	leaf vascular tissue pattern formation	26	3	0.66	0.0275
+GO:1901605	alpha-amino acid metabolic process	253	12	6.44	0.0286
+GO:0051156	glucose 6-phosphate metabolic process	27	3	0.69	0.0304
+GO:0006534	cysteine metabolic process	27	3	0.69	0.0304
+GO:1902358	sulfate transmembrane transport	11	2	0.28	0.0305
+GO:0048366	leaf development	319	14	8.12	0.0339
+GO:0009260	ribonucleotide biosynthetic process	95	6	2.42	0.0341
+GO:0006535	cysteine biosynthetic process from serine	12	2	0.31	0.0360
+GO:0006813	potassium ion transport	72	5	1.83	0.0362
+GO:0006520	amino acid metabolic process	353	15	8.98	0.0366
+GO:0009056	catabolic process	1252	42	31.86	0.0378
+GO:0000077	DNA damage checkpoint signaling	13	2	0.33	0.0418
+GO:0006112	energy reserve metabolic process	13	2	0.33	0.0418
+GO:0055075	potassium ion homeostasis	13	2	0.33	0.0418
+GO:0030026	intracellular manganese ion homeostasis	13	2	0.33	0.0418
+GO:0042770	signal transduction in response to DNA damage	13	2	0.33	0.0418
+GO:0005977	glycogen metabolic process	13	2	0.33	0.0418
+GO:0010044	response to aluminum ion	13	2	0.33	0.0418
+GO:0032776	DNA methylation on cytosine	13	2	0.33	0.0418
+GO:0046390	ribose phosphate biosynthetic process	100	6	2.54	0.0422
+GO:0022402	cell cycle process	361	15	9.19	0.0431
+GO:0009259	ribonucleotide metabolic process	182	9	4.63	0.0432
+GO:0006623	protein targeting to vacuole	31	3	0.79	0.0434
+GO:0010051	xylem and phloem pattern formation	53	4	1.35	0.0455
+GO:0009152	purine ribonucleotide biosynthetic process	77	5	1.96	0.0463
+GO:0006163	purine nucleotide metabolic process	214	10	5.45	0.0472
+GO:0000162	tryptophan biosynthetic process	14	2	0.36	0.0480
+GO:0046219	indolalkylamine biosynthetic process	14	2	0.36	0.0480
+GO:0009704	de-etiolation	14	2	0.36	0.0480
+GO:0008272	sulfate transport	14	2	0.36	0.0480
+GO:0044275	cellular carbohydrate catabolic process	54	4	1.37	0.0482
+GO:0071805	potassium ion transmembrane transport	54	4	1.37	0.0482
+GO:0046148	pigment biosynthetic process	130	7	3.31	0.0483
+GO:0034249	negative regulation of amide metabolic process	78	5	1.98	0.0484
+GO:0017148	negative regulation of translation	78	5	1.98	0.0484
+GO:0046034	ATP metabolic process	78	5	1.98	0.0484
+GO:0030001	metal ion transport	215	10	5.47	0.0485

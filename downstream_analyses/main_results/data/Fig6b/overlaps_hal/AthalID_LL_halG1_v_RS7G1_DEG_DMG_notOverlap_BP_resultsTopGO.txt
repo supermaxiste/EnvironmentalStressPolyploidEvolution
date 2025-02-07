@@ -1,0 +1,43 @@
+GO.ID	Term	Annotated	Significant	Expected	elimFisher
+GO:0030245	cellulose catabolic process	13	3	0.31	0.0031
+GO:0055062	phosphate ion homeostasis	13	3	0.31	0.0031
+GO:0046889	positive regulation of lipid biosynthetic process	23	3	0.54	0.0164
+GO:0030003	intracellular monoatomic cation homeostasis	113	7	2.68	0.0178
+GO:0009788	negative regulation of abscisic acid-activated signaling pathway	43	4	1.02	0.0184
+GO:1901420	negative regulation of response to alcohol	43	4	1.02	0.0184
+GO:1905958	negative regulation of cellular response to alcohol	43	4	1.02	0.0184
+GO:0006873	intracellular monoatomic ion homeostasis	116	7	2.75	0.0203
+GO:0045834	positive regulation of lipid metabolic process	25	3	0.59	0.0206
+GO:0006882	intracellular zinc ion homeostasis	10	2	0.24	0.0222
+GO:0009832	plant-type cell wall biogenesis	119	7	2.82	0.0229
+GO:0071555	cell wall organization	329	14	7.79	0.0250
+GO:0030641	regulation of cellular pH	27	3	0.64	0.0253
+GO:0051453	regulation of intracellular pH	27	3	0.64	0.0253
+GO:0001666	response to hypoxia	181	9	4.29	0.0284
+GO:0036293	response to decreased oxygen levels	184	9	4.36	0.0311
+GO:0070482	response to oxygen levels	185	9	4.38	0.0320
+GO:0071669	plant-type cell wall organization or biogenesis	187	9	4.43	0.0340
+GO:0009787	regulation of abscisic acid-activated signaling pathway	102	6	2.41	0.0341
+GO:1901419	regulation of response to alcohol	102	6	2.41	0.0341
+GO:1905957	regulation of cellular response to alcohol	102	6	2.41	0.0341
+GO:0009311	oligosaccharide metabolic process	77	5	1.82	0.0357
+GO:0009738	abscisic acid-activated signaling pathway	219	10	5.18	0.0358
+GO:0071456	cellular response to hypoxia	160	8	3.79	0.0366
+GO:0015743	malate transport	13	2	0.31	0.0367
+GO:0030026	intracellular manganese ion homeostasis	13	2	0.31	0.0367
+GO:0007020	microtubule nucleation	13	2	0.31	0.0367
+GO:0055085	transmembrane transport	902	30	21.36	0.0368
+GO:0036294	cellular response to decreased oxygen levels	161	8	3.81	0.0377
+GO:0016042	lipid catabolic process	161	8	3.81	0.0377
+GO:0071453	cellular response to oxygen levels	161	8	3.81	0.0377
+GO:0005991	trehalose metabolic process	14	2	0.33	0.0421
+GO:0006874	intracellular calcium ion homeostasis	33	3	0.78	0.0425
+GO:0010224	response to UV-B	56	4	1.33	0.0433
+GO:0045229	external encapsulating structure organization	355	14	8.4	0.0433
+GO:0005984	disaccharide metabolic process	57	4	1.35	0.0457
+GO:0055074	calcium ion homeostasis	34	3	0.8	0.0458
+GO:0006811	monoatomic ion transport	392	15	9.28	0.0464
+GO:0010267	ta-siRNA processing	15	2	0.36	0.0479
+GO:0015740	C4-dicarboxylate transport	15	2	0.36	0.0479
+GO:0055071	manganese ion homeostasis	15	2	0.36	0.0479
+GO:0042793	plastid transcription	15	2	0.36	0.0479

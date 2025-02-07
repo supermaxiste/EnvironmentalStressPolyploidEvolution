@@ -12,7 +12,7 @@ comm_args <- commandArgs(trailingOnly = TRUE)
 # First argument: CX_report file
 CX_file <- comm_args[1]
 
-# Second argument: low cov scaffolds file
+# Second argument: low cov regions file
 low_file <- comm_args[2]
 
 # Fourth argument: output name (without extension)

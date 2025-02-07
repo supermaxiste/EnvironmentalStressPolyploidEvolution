@@ -1,0 +1,62 @@
+GO.ID	Term	Annotated	Significant	Expected	elimFisher
+GO:0006120	mitochondrial electron transport, NADH to ubiquinone	12	3	0.27	0.0022
+GO:0042401	biogenic amine biosynthetic process	29	4	0.66	0.0040
+GO:0009150	purine ribonucleotide metabolic process	163	10	3.7	0.0041
+GO:0098754	detoxification	165	10	3.75	0.0044
+GO:2000024	regulation of leaf development	20	3	0.45	0.0099
+GO:0006094	gluconeogenesis	21	3	0.48	0.0114
+GO:0009798	axis specification	39	4	0.89	0.0115
+GO:0019319	hexose biosynthetic process	22	3	0.5	0.0130
+GO:0042147	retrograde transport, endosome to Golgi	22	3	0.5	0.0130
+GO:0006810	transport	1891	57	42.94	0.0137
+GO:0000097	sulfur amino acid biosynthetic process	42	4	0.95	0.0148
+GO:0016197	endosomal transport	64	5	1.45	0.0149
+GO:0065001	specification of axis polarity	24	3	0.55	0.0165
+GO:0051234	establishment of localization	1911	57	43.4	0.0167
+GO:0051179	localization	2020	59	45.87	0.0221
+GO:0071702	organic substance transport	1133	36	25.73	0.0244
+GO:0044070	regulation of monoatomic anion transport	11	2	0.25	0.0247
+GO:0022898	regulation of transmembrane transporter activity	11	2	0.25	0.0247
+GO:0006596	polyamine biosynthetic process	11	2	0.25	0.0247
+GO:0032412	regulation of monoatomic ion transmembrane transporter activity	11	2	0.25	0.0247
+GO:0016482	cytosolic transport	28	3	0.64	0.0250
+GO:0006367	transcription initiation at RNA polymerase II promoter	29	3	0.66	0.0274
+GO:0033260	nuclear DNA replication	12	2	0.27	0.0292
+GO:0006570	tyrosine metabolic process	12	2	0.27	0.0292
+GO:0005992	trehalose biosynthetic process	12	2	0.27	0.0292
+GO:0106074	aminoacyl-tRNA metabolism involved in translational fidelity	12	2	0.27	0.0292
+GO:1901605	alpha-amino acid metabolic process	253	11	5.75	0.0298
+GO:0030488	tRNA methylation	30	3	0.68	0.0299
+GO:0015031	protein transport	631	22	14.33	0.0303
+GO:0009311	oligosaccharide metabolic process	77	5	1.75	0.0306
+GO:0006400	tRNA modification	77	5	1.75	0.0306
+GO:0046034	ATP metabolic process	78	5	1.77	0.0321
+GO:0045184	establishment of protein localization	637	22	14.47	0.0331
+GO:0008033	tRNA processing	106	6	2.41	0.0337
+GO:0032409	regulation of transporter activity	13	2	0.3	0.0340
+GO:0046519	sphingoid metabolic process	13	2	0.3	0.0340
+GO:0051641	cellular localization	897	29	20.37	0.0341
+GO:0034032	purine nucleoside bisphosphate metabolic process	55	4	1.25	0.0359
+GO:0033865	nucleoside bisphosphate metabolic process	55	4	1.25	0.0359
+GO:0033875	ribonucleoside bisphosphate metabolic process	55	4	1.25	0.0359
+GO:0055085	transmembrane transport	902	29	20.48	0.0363
+GO:0000162	tryptophan biosynthetic process	14	2	0.32	0.0391
+GO:0046219	indolalkylamine biosynthetic process	14	2	0.32	0.0391
+GO:0005991	trehalose metabolic process	14	2	0.32	0.0391
+GO:1902182	shoot apical meristem development	14	2	0.32	0.0391
+GO:0043605	amide catabolic process	14	2	0.32	0.0391
+GO:1990748	cellular detoxification	110	6	2.5	0.0393
+GO:0016192	vesicle-mediated transport	400	15	9.08	0.0397
+GO:0097237	cellular response to toxic substance	111	6	2.52	0.0407
+GO:0006399	tRNA metabolic process	171	8	3.88	0.0414
+GO:0009205	purine ribonucleoside triphosphate metabolic process	84	5	1.91	0.0422
+GO:0070727	cellular macromolecule localization	730	24	16.58	0.0437
+GO:0009144	purine nucleoside triphosphate metabolic process	85	5	1.93	0.0440
+GO:0006352	DNA-templated transcription initiation	59	4	1.34	0.0448
+GO:0000096	sulfur amino acid metabolic process	59	4	1.34	0.0448
+GO:0006096	glycolytic process	59	4	1.34	0.0448
+GO:0006757	ATP generation from ADP	59	4	1.34	0.0448
+GO:0046031	ADP metabolic process	59	4	1.34	0.0448
+GO:0009072	aromatic amino acid metabolic process	60	4	1.36	0.0471
+GO:0007034	vacuolar transport	87	5	1.98	0.0478
+GO:0070588	calcium ion transmembrane transport	61	4	1.39	0.0496

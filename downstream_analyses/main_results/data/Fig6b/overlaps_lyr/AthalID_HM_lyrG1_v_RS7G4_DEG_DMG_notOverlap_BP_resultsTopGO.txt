@@ -1,0 +1,30 @@
+GO.ID	Term	Annotated	Significant	Expected	elimFisher
+GO:0009787	regulation of abscisic acid-activated signaling pathway	103	9	2.73	0.0016
+GO:0110096	cellular response to aldehyde	10	3	0.26	0.0019
+GO:0006268	DNA unwinding involved in DNA replication	10	3	0.26	0.0019
+GO:2000022	regulation of jasmonic acid mediated signaling pathway	31	4	0.82	0.0086
+GO:1901136	carbohydrate derivative catabolic process	50	5	1.32	0.0101
+GO:0006012	galactose metabolic process	19	3	0.5	0.0130
+GO:0098661	inorganic anion transmembrane transport	61	5	1.62	0.0224
+GO:0019932	second-messenger-mediated signaling	43	4	1.14	0.0265
+GO:0032958	inositol phosphate biosynthetic process	10	2	0.26	0.0273
+GO:0014074	response to purine-containing compound	10	2	0.26	0.0273
+GO:0042753	positive regulation of circadian rhythm	10	2	0.26	0.0273
+GO:0046500	S-adenosylmethionine metabolic process	10	2	0.26	0.0273
+GO:0010038	response to metal ion	161	9	4.26	0.0275
+GO:0044282	small molecule catabolic process	188	10	4.98	0.0281
+GO:0044247	cellular polysaccharide catabolic process	26	3	0.69	0.0305
+GO:1901617	organic hydroxy compound biosynthetic process	166	9	4.4	0.0326
+GO:0034063	stress granule assembly	11	2	0.29	0.0328
+GO:0097354	prenylation	11	2	0.29	0.0328
+GO:0046365	monosaccharide catabolic process	11	2	0.29	0.0328
+GO:0018342	protein prenylation	11	2	0.29	0.0328
+GO:2000031	regulation of salicylic acid mediated signaling pathway	27	3	0.72	0.0337
+GO:0072348	sulfur compound transport	28	3	0.74	0.0370
+GO:0046173	polyol biosynthetic process	28	3	0.74	0.0370
+GO:0032784	regulation of DNA-templated transcription elongation	30	3	0.79	0.0441
+GO:0015918	sterol transport	13	2	0.34	0.0450
+GO:0050688	regulation of defense response to virus	13	2	0.34	0.0450
+GO:0010044	response to aluminum ion	13	2	0.34	0.0450
+GO:0042752	regulation of circadian rhythm	51	4	1.35	0.0456
+GO:0009251	glucan catabolic process	31	3	0.82	0.0479

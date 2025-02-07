@@ -1127,7 +1127,7 @@ df6 <- HM_CHH_lyr
 
 range <- 500
 
-breaks <- c(c(-1, -0.5, 0, 0.5, 1, 1.5, 2) * range)
+breaks <- c(c(-1, -0.5, 0, 0.5, 1, 1.4, 1.8) * range)
 labels <- c(-range, -range/2, '0%', '50%', '100%', range/2, range)
 ylabs <- c('Mean methylation\nlevel', 'Mean recalibrated\nmethylation level')
 
@@ -1151,9 +1151,10 @@ ggplt1 <- ggplt1 + xlab(NULL)
 ggplt1 <- ggplt1 + ylab(ylabs[2])
 ggplt1 <- ggplt1 + theme_bw()
 ggplt1 <- ggplt1 + theme(text = element_text(size=15),
-                         strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
-                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 10),
-                         legend.position = "none")
+                         strip.background = element_rect(color="white", fill="white", linewidth=1.5, linetype="solid"),
+                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 20),
+                         axis.text.y = element_text(vjust = 0.5, hjust=0.5, size = 20))#,
+                         #legend.position = "none")
 ggplt1 <- ggplt1 + ggtitle(expression(paste("Cold conditions (CG) ",italic("\nhalleri-side"))))
 ggplt1
 
@@ -1176,10 +1177,11 @@ ggplt2 <- ggplt2 + xlab(NULL)
 ggplt2 <- ggplt2 + ylab(ylabs[2])
 ggplt2 <- ggplt2 + theme_bw()
 ggplt2 <- ggplt2 + theme(text = element_text(size=15),
-                         strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
-                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 10),
+                         strip.background = element_rect(color="white", fill="white", linewidth=1.5, linetype="solid"),
+                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 20),
+                         axis.text.y = element_text(vjust = 0.5, hjust=0.5, size = 20))
                          #legend.title = element_blank(),
-                         legend.position = "none")
+                         #legend.position = "none")
 ggplt2 <- ggplt2 + ggtitle(expression(paste("Cold conditions (CHG) ",italic("\nhalleri-side"))))
 ggplt2
 
@@ -1202,9 +1204,10 @@ ggplt3 <- ggplt3 + xlab('Distance from annotation')
 ggplt3 <- ggplt3 + ylab(ylabs[2])
 ggplt3 <- ggplt3 + theme_bw()
 ggplt3 <- ggplt3 + theme(text = element_text(size=15),
-                         strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
-                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 10),
-                         legend.position = "none")
+                         strip.background = element_rect(color="white", fill="white", linewidth=1.5, linetype="solid"),
+                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 20),
+                         axis.text.y = element_text(vjust = 0.5, hjust=0.5, size = 20))
+                         #legend.position = "none")
 ggplt3 <- ggplt3 + ggtitle(expression(paste("Cold conditions (CHH) ",italic("\nhalleri-side"))))
 ggplt3
 
@@ -1227,10 +1230,10 @@ ggplt4 <- ggplt4 + xlab(NULL)
 ggplt4 <- ggplt4 + ylab(NULL)
 ggplt4 <- ggplt4 + theme_bw()
 ggplt4 <- ggplt4 + theme(text = element_text(size=15),
-                         strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
-                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 10),
-                         legend.position = "none")
-ggplt4 <- ggplt4 + ggtitle(expression(italic("lyrata-side")))
+                         strip.background = element_rect(color="white", fill="white", linewidth=1.5, linetype="solid"),
+                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 20),
+                         axis.text.y = element_text(vjust = 0.5, hjust=0.5, size = 20))
+                         #legend.position = "none")
 ggplt4 <- ggplt4 + ggtitle(expression(paste("Cold conditions (CG) ",italic("\nlyrata-side"))))
 ggplt4
 
@@ -1254,9 +1257,10 @@ ggplt5 <- ggplt5 + ylab(NULL)
 ggplt5 <- ggplt5 + theme_bw()
 ggplt5 <- ggplt5 + theme(text = element_text(size=15),
                          strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
-                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 10),
+                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 20),
+                         axis.text.y = element_text(vjust = 0.5, hjust=0.5, size = 20))
                          #legend.title = element_blank(),
-                         legend.position = "none")
+                         #legend.position = "none")
 ggplt5 <- ggplt5 + ggtitle(expression(paste("Cold conditions (CHG) ",italic("\nlyrata-side"))))
 ggplt5
 
@@ -1280,8 +1284,9 @@ ggplt6 <- ggplt6 + ylab(NULL)
 ggplt6 <- ggplt6 + theme_bw()
 ggplt6 <- ggplt6 + theme(text = element_text(size=15),
                          strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
-                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 10),
-                         legend.position = "none")
+                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 20),
+                         axis.text.y = element_text(vjust = 0.5, hjust=0.5, size = 20))
+                         #legend.position = "none")
 ggplt6 <- ggplt6 + ggtitle(expression(paste("Cold conditions (CHH) ",italic("\nlyrata-side"))))
 ggplt6
 
@@ -1300,7 +1305,7 @@ df6 <- LL_CHH_lyr
 
 range <- 500
 
-breaks <- c(c(-1, -0.5, 0, 0.5, 1, 1.5, 2) * range)
+breaks <- c(c(-1, -0.5, 0, 0.5, 1, 1.4, 1.8) * range)
 labels <- c(-range, -range/2, '0%', '50%', '100%', range/2, range)
 ylabs <- c('Mean methylation\nlevel', 'Mean recalibrated\nmethylation level')
 
@@ -1322,9 +1327,9 @@ ggplt1 <- ggplt1 + xlab(NULL)
 ggplt1 <- ggplt1 + ylab(ylabs[2])
 ggplt1 <- ggplt1 + theme_bw()
 ggplt1 <- ggplt1 + theme(text = element_text(size=15),
-                         strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
-                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 10),
-                         legend.position = "none")
+                         strip.background = element_rect(color="white", fill="white", linewidth=1.5, linetype="solid"),
+                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 20),
+                         axis.text.y = element_text(vjust = 0.5, hjust=0.5, size = 20))
 ggplt1 <- ggplt1 + ggtitle(expression(paste("Hot conditions ",italic("\nhalleri-side"))))
 ggplt1
 
@@ -1347,9 +1352,10 @@ ggplt2 <- ggplt2 + xlab(NULL)
 ggplt2 <- ggplt2 + ylab(ylabs[2])
 ggplt2 <- ggplt2 + theme_bw()
 ggplt2 <- ggplt2 + theme(text = element_text(size=15),
-                         strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
-                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 10),
-                         legend.title = element_blank())
+                         strip.background = element_rect(color="white", fill="white", linewidth=1.5, linetype="solid"),
+                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 20),
+                         axis.text.y = element_text(vjust = 0.5, hjust=0.5, size = 20))
+ggplt2 <- ggplt2 + ggtitle(expression(paste("Hot conditions ",italic("\nhalleri-side"))))
 ggplt2
 
 # Enrichment profile halleri CHH
@@ -1371,9 +1377,10 @@ ggplt3 <- ggplt3 + xlab('Distance from annotation')
 ggplt3 <- ggplt3 + ylab(ylabs[2])
 ggplt3 <- ggplt3 + theme_bw()
 ggplt3 <- ggplt3 + theme(text = element_text(size=15),
-                         strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
-                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 10),
-                         legend.position = "none")
+                         strip.background = element_rect(color="white", fill="white", linewidth=1.5, linetype="solid"),
+                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 20),
+                         axis.text.y = element_text(vjust = 0.5, hjust=0.5, size = 20))
+ggplt3 <- ggplt3 + ggtitle(expression(paste("Hot conditions ",italic("\nhalleri-side"))))
 ggplt3
 
 # Enrichment profile lyrata CG
@@ -1395,9 +1402,9 @@ ggplt4 <- ggplt4 + xlab(NULL)
 ggplt4 <- ggplt4 + ylab(NULL)
 ggplt4 <- ggplt4 + theme_bw()
 ggplt4 <- ggplt4 + theme(text = element_text(size=15),
-                         strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
-                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 10),
-                         legend.position = "none")
+                         strip.background = element_rect(color="white", fill="white", linewidth=1.5, linetype="solid"),
+                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 20),
+                         axis.text.y = element_text(vjust = 0.5, hjust=0.5, size = 20))
 ggplt4 <- ggplt4 + ggtitle(expression(italic("lyrata-side")))
 ggplt4
 
@@ -1420,9 +1427,10 @@ ggplt5 <- ggplt5 + xlab(NULL)
 ggplt5 <- ggplt5 + ylab(NULL)
 ggplt5 <- ggplt5 + theme_bw()
 ggplt5 <- ggplt5 + theme(text = element_text(size=15),
-                         strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
-                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 10),
-                         legend.title = element_blank())
+                         strip.background = element_rect(color="white", fill="white", linewidth=1.5, linetype="solid"),
+                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 20),
+                         axis.text.y = element_text(vjust = 0.5, hjust=0.5, size = 20))
+ggplt5 <- ggplt5 + ggtitle(expression(italic("lyrata-side")))
 ggplt5
 
 # Enrichment profile lyrata CHH
@@ -1444,9 +1452,11 @@ ggplt6 <- ggplt6 + xlab('Distance from annotation')
 ggplt6 <- ggplt6 + ylab(NULL)
 ggplt6 <- ggplt6 + theme_bw()
 ggplt6 <- ggplt6 + theme(text = element_text(size=15),
-                         strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
-                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 10),
-                         legend.position = "none")
+                         strip.background = element_rect(color="white", fill="white", linewidth=1.5, linetype="solid"),
+                         axis.text.x = element_text(vjust = 0.5, hjust=0.5, size = 20),
+                         axis.text.y = element_text(vjust = 0.5, hjust=0.5, size = 20))
+                         #legend.position = "none")
+ggplt6 <- ggplt6 + ggtitle(expression(italic("lyrata-side")))
 ggplt6
 
 ### All enrichment profiles together for LL conditions

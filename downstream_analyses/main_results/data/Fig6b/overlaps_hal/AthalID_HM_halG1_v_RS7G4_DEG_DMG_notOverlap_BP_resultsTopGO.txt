@@ -1,0 +1,46 @@
+GO.ID	Term	Annotated	Significant	Expected	elimFisher
+GO:0019853	L-ascorbic acid biosynthetic process	13	3	0.33	0.0038
+GO:0046185	aldehyde catabolic process	16	3	0.4	0.0070
+GO:0009798	axis specification	39	4	0.99	0.0164
+GO:1902645	tertiary alcohol biosynthetic process	22	3	0.56	0.0173
+GO:0043289	apocarotenoid biosynthetic process	22	3	0.56	0.0173
+GO:0009838	abscission	22	3	0.56	0.0173
+GO:0009688	abscisic acid biosynthetic process	22	3	0.56	0.0173
+GO:0006261	DNA-templated DNA replication	109	7	2.76	0.0206
+GO:0140115	export across plasma membrane	63	5	1.59	0.0213
+GO:0065001	specification of axis polarity	24	3	0.61	0.0219
+GO:0035672	oligopeptide transmembrane transport	24	3	0.61	0.0219
+GO:0006260	DNA replication	137	8	3.46	0.0230
+GO:0098754	detoxification	165	9	4.17	0.0244
+GO:0110096	cellular response to aldehyde	10	2	0.25	0.0251
+GO:0000394	RNA splicing, via endonucleolytic cleavage and ligation	10	2	0.25	0.0251
+GO:0009636	response to toxic substance	195	10	4.93	0.0266
+GO:0046618	xenobiotic export from cell	26	3	0.66	0.0271
+GO:0006817	phosphate ion transport	26	3	0.66	0.0271
+GO:1990961	xenobiotic detoxification by transmembrane export across the plasma membrane	26	3	0.66	0.0271
+GO:0009267	cellular response to starvation	116	7	2.93	0.0278
+GO:0000054	ribosomal subunit export from nucleus	11	2	0.28	0.0302
+GO:0033750	ribosome localization	11	2	0.28	0.0302
+GO:0042594	response to starvation	145	8	3.67	0.0309
+GO:0120255	olefinic compound biosynthetic process	48	4	1.21	0.0327
+GO:0010115	regulation of abscisic acid biosynthetic process	12	2	0.3	0.0356
+GO:0033260	nuclear DNA replication	12	2	0.3	0.0356
+GO:0006120	mitochondrial electron transport, NADH to ubiquinone	12	2	0.3	0.0356
+GO:0045005	DNA-templated DNA replication maintenance of fidelity	12	2	0.3	0.0356
+GO:0016106	sesquiterpenoid biosynthetic process	29	3	0.73	0.0360
+GO:0006857	oligopeptide transport	30	3	0.76	0.0393
+GO:0007389	pattern specification process	153	8	3.87	0.0405
+GO:0030245	cellulose catabolic process	13	2	0.33	0.0414
+GO:0051275	beta-glucan catabolic process	13	2	0.33	0.0414
+GO:0006020	inositol metabolic process	13	2	0.33	0.0414
+GO:0003002	regionalization	127	7	3.21	0.0423
+GO:0071215	cellular response to abscisic acid stimulus	241	11	6.09	0.0428
+GO:0097306	cellular response to alcohol	241	11	6.09	0.0428
+GO:0031669	cellular response to nutrient levels	129	7	3.26	0.0453
+GO:0016101	diterpenoid metabolic process	32	3	0.81	0.0463
+GO:0015833	peptide transport	32	3	0.81	0.0463
+GO:0042886	amide transport	54	4	1.37	0.0473
+GO:0006829	zinc ion transport	14	2	0.35	0.0475
+GO:0045828	positive regulation of isoprenoid metabolic process	14	2	0.35	0.0475
+GO:0031668	cellular response to extracellular stimulus	159	8	4.02	0.0489
+GO:0009749	response to glucose	55	4	1.39	0.0500

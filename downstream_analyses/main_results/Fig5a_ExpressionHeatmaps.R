@@ -11,12 +11,12 @@ library(ComplexHeatmap)
 ## Paths to define
 
 # Paths to genome annotation files
-Ahal_anno_path <- c("path/to/anno_hal.gff")
-Alyr_anno_path <- c("path/to/anno_lyr.gff")
+Ahal_anno_path <- c("~/Library/CloudStorage/OneDrive-Personal/PhD/Project/bs_data/Ahal_genome_Dario/hal_MAKER_PASA_46264_noTEs.gff")
+Alyr_anno_path <- c("~/Library/CloudStorage/OneDrive-Personal/PhD/Project/bs_data/Alyr_genome_Dario/lyr_MAKER_PASA_41817_renamed.gff")
 # Path to file with low coverage genes
-low_coverage_genes <- c("path/to/downstream_analyses/main_results/data/Fig5a/")
+low_coverage_genes <- c("~/Library/CloudStorage/OneDrive-Personal/PostDoc/Chapter2_3_manuscript/EnvironmentalStressPolyploidEvolution/downstream_analyses/main_results/data/Fig5a/")
 # Path to count tables (featureCounts output)
-count_tables <- c("path/to/count_tables_folder/")
+count_tables <- c("~/Library/CloudStorage/OneDrive-Personal/PostDoc/coverage_analysis/")
 
 ## In the first part of the script we import
 ## the annotations to exclude genes falling

@@ -1,0 +1,27 @@
+GO.ID	Term	Annotated	Significant	Expected	elimFisher
+GO:0030245	cellulose catabolic process	13	3	0.22	0.0012
+GO:0009627	systemic acquired resistance	77	6	1.29	0.0018
+GO:0033750	ribosome localization	11	2	0.18	0.0139
+GO:0000054	ribosomal subunit export from nucleus	11	2	0.18	0.0139
+GO:0033260	nuclear DNA replication	12	2	0.2	0.0165
+GO:0016042	lipid catabolic process	161	7	2.7	0.0187
+GO:0006020	inositol metabolic process	13	2	0.22	0.0193
+GO:0007020	microtubule nucleation	13	2	0.22	0.0193
+GO:0042770	signal transduction in response to DNA damage	13	2	0.22	0.0193
+GO:0000077	DNA damage checkpoint signaling	13	2	0.22	0.0193
+GO:0009704	de-etiolation	14	2	0.23	0.0223
+GO:0071248	cellular response to metal ion	15	2	0.25	0.0254
+GO:0010267	ta-siRNA processing	15	2	0.25	0.0254
+GO:0022611	dormancy process	38	3	0.64	0.0254
+GO:0010162	seed dormancy process	38	3	0.64	0.0254
+GO:0072659	protein localization to plasma membrane	17	2	0.28	0.0322
+GO:0046785	microtubule polymerization	17	2	0.28	0.0322
+GO:0051258	protein polymerization	43	3	0.72	0.0350
+GO:0010440	stomatal lineage progression	18	2	0.3	0.0358
+GO:0031570	DNA integrity checkpoint signaling	18	2	0.3	0.0358
+GO:0006888	endoplasmic reticulum to Golgi vesicle-mediated transport	75	4	1.26	0.0370
+GO:0032535	regulation of cellular component size	45	3	0.75	0.0393
+GO:0090066	regulation of anatomical structure size	45	3	0.75	0.0393
+GO:0031503	protein-containing complex localization	19	2	0.32	0.0396
+GO:1990778	protein localization to cell periphery	20	2	0.33	0.0435
+GO:0006629	lipid metabolic process	794	20	13.3	0.0442

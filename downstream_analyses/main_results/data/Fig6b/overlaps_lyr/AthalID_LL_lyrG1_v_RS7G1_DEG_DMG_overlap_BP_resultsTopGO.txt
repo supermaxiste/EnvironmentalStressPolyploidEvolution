@@ -1,0 +1,55 @@
+GO.ID	Term	Annotated	Significant	Expected	elimFisher
+GO:0009089	lysine biosynthetic process via diaminopimelate	13	3	0.15	0.00043
+GO:0006413	translational initiation	86	5	1.02	0.00357
+GO:0046500	S-adenosylmethionine metabolic process	10	2	0.12	0.00593
+GO:0019762	glucosinolate catabolic process	10	2	0.12	0.00593
+GO:1901605	alpha-amino acid metabolic process	249	11	2.96	0.00639
+GO:0043266	regulation of potassium ion transport	11	2	0.13	0.00720
+GO:0006596	polyamine biosynthetic process	12	2	0.14	0.00857
+GO:0015918	sterol transport	13	2	0.15	0.01005
+GO:0043094	cellular metabolic compound salvage	74	4	0.88	0.01160
+GO:0009070	serine family amino acid biosynthetic process	40	3	0.48	0.01179
+GO:0000097	sulfur amino acid biosynthetic process	40	3	0.48	0.01179
+GO:0033750	ribosome localization	15	2	0.18	0.01332
+GO:0009862	systemic acquired resistance, salicylic acid mediated signaling pathway	15	2	0.18	0.01332
+GO:0000054	ribosomal subunit export from nucleus	15	2	0.18	0.01332
+GO:0051640	organelle localization	123	5	1.46	0.01564
+GO:0009853	photorespiration	48	3	0.57	0.01927
+GO:0006081	cellular aldehyde metabolic process	48	3	0.57	0.01927
+GO:0046907	intracellular transport	580	13	6.9	0.02071
+GO:0051592	response to calcium ion	19	2	0.23	0.02103
+GO:1901607	alpha-amino acid biosynthetic process	150	8	1.78	0.02200
+GO:0001732	formation of cytoplasmic translation initiation complex	20	2	0.24	0.02318
+GO:0006869	lipid transport	95	4	1.13	0.02654
+GO:0009069	serine family amino acid metabolic process	55	3	0.65	0.02754
+GO:0071805	potassium ion transmembrane transport	55	3	0.65	0.02754
+GO:0019344	cysteine biosynthetic process	22	2	0.26	0.02775
+GO:0051649	establishment of localization in cell	605	13	7.19	0.02802
+GO:0031503	protein-containing complex localization	23	2	0.27	0.03016
+GO:0072329	monocarboxylic acid catabolic process	58	3	0.69	0.03157
+GO:0000096	sulfur amino acid metabolic process	58	3	0.69	0.03157
+GO:0009932	cell tip growth	102	4	1.21	0.03327
+GO:0051168	nuclear export	60	3	0.71	0.03443
+GO:0046653	tetrahydrofolate metabolic process	25	2	0.3	0.03522
+GO:0015850	organic hydroxy compound transport	25	2	0.3	0.03522
+GO:0006563	L-serine metabolic process	25	2	0.3	0.03522
+GO:0030001	metal ion transport	221	8	2.63	0.03732
+GO:0010025	wax biosynthetic process	26	2	0.31	0.03786
+GO:0010166	wax metabolic process	26	2	0.31	0.03786
+GO:1901566	organonitrogen compound biosynthetic process	1294	30	15.38	0.03928
+GO:0010876	lipid localization	108	4	1.28	0.03977
+GO:0008652	amino acid biosynthetic process	174	8	2.07	0.04010
+GO:0098876	vesicle-mediated transport to the plasma membrane	27	2	0.32	0.04058
+GO:0006730	one-carbon metabolic process	27	2	0.32	0.04058
+GO:0002183	cytoplasmic translational initiation	27	2	0.32	0.04058
+GO:0006813	potassium ion transport	76	5	0.9	0.04078
+GO:0006810	transport	1876	32	22.3	0.04171
+GO:0072594	establishment of protein localization to organelle	218	6	2.59	0.04581
+GO:0048278	vesicle docking	29	2	0.34	0.04623
+GO:0002758	innate immune response-activating signaling pathway	29	2	0.34	0.04623
+GO:0006534	cysteine metabolic process	29	2	0.34	0.04623
+GO:0051234	establishment of localization	1896	32	22.54	0.04707
+GO:0051656	establishment of organelle localization	68	3	0.81	0.04711
+GO:0002764	immune response-regulating signaling pathway	30	2	0.36	0.04915
+GO:0002757	immune response-activating signaling pathway	30	2	0.36	0.04915
+GO:0006886	intracellular protein transport	401	9	4.77	0.04986

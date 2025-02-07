@@ -100,6 +100,14 @@ LL_TKSG1_v_RS7G4_lyr_DEG <- read.delim(paste0(DEG_folder, "LL_TKSG1_v_RS7G4_lyr_
 LL_TKSG1_v_G5_hal_DEG <- read.delim(paste0(DEG_folder, "LL_TKSG1_v_G5_hal_DEG.txt"))
 LL_TKSG1_v_G5_lyr_DEG <- read.delim(paste0(DEG_folder, "LL_TKSG1_v_G5_lyr_DEG.txt"))
 
+# across conditions
+
+HMvLL_synG1_hal_DEG <- read.delim(paste0(DEG_folder, "synG1_HMvLL_hal_DEG.txt"))
+HMvLL_synG1_lyr_DEG <- read.delim(paste0(DEG_folder, "synG1_HMvLL_lyr_DEG.txt"))
+HMvLL_synG4_hal_DEG <- read.delim(paste0(DEG_folder, "synG4_HMvLL_hal_DEG.txt"))
+HMvLL_synG4_lyr_DEG <- read.delim(paste0(DEG_folder, "synG4_HMvLL_lyr_DEG.txt"))
+
+
 # We filter low coverage regions since they lead to zero counts in
 # fourth generation synthetics and false DEGs
 
@@ -180,6 +188,19 @@ LL_TKSG1_v_RS7G4_lyr_DEG_flt <- filter(LL_TKSG1_v_RS7G4_lyr_DEG, !(geneID %in% L
 LL_TKSG1_v_G5_hal_DEG_flt <- filter(LL_TKSG1_v_G5_hal_DEG, !(geneID %in% LL_lowC_genes_hal$V1))
 LL_TKSG1_v_G5_lyr_DEG_flt <- filter(LL_TKSG1_v_G5_lyr_DEG, !(geneID %in% LL_lowC_genes_lyr$V1))
 
+# across conditions
+
+HMvLL_synG1_hal_DEG_flt <- filter(HMvLL_synG1_hal_DEG, !(geneID %in% HM_lowC_genes_hal$V1))
+HMvLL_synG1_lyr_DEG_flt <- filter(HMvLL_synG1_lyr_DEG, !(geneID %in% HM_lowC_genes_lyr$V1))
+
+HMvLL_synG1_hal_DEG_flt <- filter(HMvLL_synG1_hal_DEG_flt, !(geneID %in% LL_lowC_genes_hal$V1))
+HMvLL_synG1_lyr_DEG_flt <- filter(HMvLL_synG1_lyr_DEG_flt, !(geneID %in% LL_lowC_genes_lyr$V1))
+
+HMvLL_synG4_hal_DEG_flt <- filter(HMvLL_synG4_hal_DEG, !(geneID %in% HM_lowC_genes_hal$V1))
+HMvLL_synG4_lyr_DEG_flt <- filter(HMvLL_synG4_lyr_DEG, !(geneID %in% HM_lowC_genes_lyr$V1))
+
+HMvLL_synG4_hal_DEG_flt <- filter(HMvLL_synG4_hal_DEG_flt, !(geneID %in% LL_lowC_genes_hal$V1))
+HMvLL_synG4_lyr_DEG_flt <- filter(HMvLL_synG4_lyr_DEG_flt, !(geneID %in% LL_lowC_genes_lyr$V1))
 
 # plotting DEG over generations
 
@@ -201,13 +222,13 @@ DEG$dir[DEG$dir == -1] <- "down"
 
 
 HM_gghal <- ggplot(data = DEG, aes(x = generation, fill = as.factor(dir))) +
-  geom_bar(width = 0.4) +
+  geom_bar(width = 0.75) +
   xlab("Generation") +
   ylab("Count") +
   theme_bw() +
   theme(text = element_text(size=15),
         legend.position = "none") +
-  ylim(0, 12000) +
+  ylim(0, 10000) +
   ggtitle("Cold conditions \nhalleri side")
 
 #HM conditions, lyrata side
@@ -222,13 +243,13 @@ DEG_lyr$dir[DEG_lyr$dir == 1] <- "up"
 DEG_lyr$dir[DEG_lyr$dir == -1] <- "down"
 
 HM_gglyr <- ggplot(data = DEG_lyr, aes(x = generation, fill = dir)) +
-  geom_bar(width = 0.4) +
+  geom_bar(width = 0.75) +
   xlab("Generation") +
   ylab("") +
   theme_bw() +
   theme(text = element_text(size=15),
         legend.position = "none") +
-  ylim(0, 12000) +
+  ylim(0, 10000) +
   ggtitle("\nlyrata side")
 
 #LL conditions, halleri side
@@ -244,13 +265,13 @@ DEG$dir[DEG$dir == -1] <- "down"
 
 
 LL_gghal <- ggplot(data = DEG, aes(x = generation, fill = as.factor(dir))) +
-  geom_bar(width = 0.4) +
+  geom_bar(width = 0.75) +
   xlab("Generation") +
   ylab("") +
   theme_bw() +
   theme(text = element_text(size=15),
         legend.position = "none") +
-  ylim(0, 12000) +
+  ylim(0, 10000) +
   ggtitle("Hot conditions \nhalleri side")
 
 #LL conditions, lyrata side
@@ -265,13 +286,13 @@ DEG_lyr$dir[DEG_lyr$dir == 1] <- "up"
 DEG_lyr$dir[DEG_lyr$dir == -1] <- "down"
 
 LL_gglyr <- ggplot(data = DEG_lyr, aes(x = generation, fill = dir)) +
-  geom_bar(width = 0.4) +
+  geom_bar(width = 0.75) +
   xlab("Generation") +
   ylab("") +
   theme_bw() +
   theme(text = element_text(size=15),
         legend.title = element_blank()) +
-  ylim(0, 12000) +
+  ylim(0, 10000) +
   ggtitle("\nlyrata side")
 
 HM_gghal + HM_gglyr + LL_gghal + LL_gglyr + plot_layout(ncol = 4)
@@ -295,14 +316,14 @@ DEG$dir[DEG$dir == 1] <- "up"
 DEG$dir[DEG$dir == -1] <- "down"
 
 HM_gghal <- ggplot(data = DEG, aes(x = generation, fill = dir)) +
-  geom_bar() +
+  geom_bar(width = 0.75) +
   scale_x_discrete(labels = c("NvsP1", "NvsS1", "NvsS4")) +
   xlab("Generation") +
   ylab("") +
   theme_bw() +
   theme(text = element_text(size=15),
         legend.position = "none") +
-  ylim(0, 12000) +
+  ylim(0, 10000) +
   ggtitle("Cold conditions \nhalleri side")
 
 
@@ -320,14 +341,14 @@ DEG_lyr$dir[DEG_lyr$dir == 1] <- "up"
 DEG_lyr$dir[DEG_lyr$dir == -1] <- "down"
 
 HM_gglyr <- ggplot(data = DEG_lyr, aes(x = generation, fill = dir)) +
-  geom_bar() +
+  geom_bar(width = 0.75) +
   scale_x_discrete(labels = c("NvsP1", "NvsS1", "NvsS4")) +
   xlab("Generation") +
   ylab("") +
   theme_bw() +
   theme(text = element_text(size=15),
         legend.position = "none") +
-  ylim(0, 12000) +
+  ylim(0, 10000) +
   ggtitle("\nlyrata side")
 
 #LL conditions, halleri side
@@ -344,14 +365,14 @@ DEG$dir[DEG$dir == 1] <- "up"
 DEG$dir[DEG$dir == -1] <- "down"
 
 LL_gghal <- ggplot(data = DEG, aes(x = generation, fill = dir)) +
-  geom_bar() +
+  geom_bar(width = 0.75) +
   scale_x_discrete(labels = c("NvsP1", "NvsS1", "NvsS4")) +
   xlab("Generation") +
   ylab("") +
   theme_bw() +
   theme(text = element_text(size=15),
         legend.position = "none") +
-  ylim(0, 12000) +
+  ylim(0, 10000) +
   ggtitle("Hot conditions \nhalleri side")
 
 
@@ -369,14 +390,14 @@ DEG_lyr$dir[DEG_lyr$dir == 1] <- "up"
 DEG_lyr$dir[DEG_lyr$dir == -1] <- "down"
 
 LL_gglyr <- ggplot(data = DEG_lyr, aes(x = generation, fill = dir)) +
-  geom_bar() +
+  geom_bar(width = 0.75) +
   scale_x_discrete(labels = c("NvsP1", "NvsS1", "NvsS4")) +
   xlab("Generation") +
   ylab("Count") +
   theme_bw() +
   theme(text = element_text(size=15),
         legend.title = element_blank()) +
-  ylim(0, 12000) +
+  ylim(0, 10000) +
   ggtitle("\nlyrata side")
 
 
@@ -398,7 +419,7 @@ DEG$dir[DEG$dir == 1] <- "up"
 DEG$dir[DEG$dir == -1] <- "down"
 
 HM_gghal <- ggplot(data = DEG, aes(x = generation, fill = dir)) +
-  geom_bar() +
+  geom_bar(width = 0.75) +
   scale_x_discrete(labels = c("NvsP1", "NvsS1", "NvsS4")) +
   xlab("Generation") +
   ylab("Count") +
@@ -423,14 +444,14 @@ DEG_lyr$dir[DEG_lyr$dir == 1] <- "up"
 DEG_lyr$dir[DEG_lyr$dir == -1] <- "down"
 
 HM_gglyr <- ggplot(data = DEG_lyr, aes(x = generation, fill = dir)) +
-  geom_bar() +
+  geom_bar(width = 0.75) +
   scale_x_discrete(labels = c("NvsP1", "NvsS1", "NvsS4")) +
   xlab("Generation") +
   ylab("") +
   theme_bw() +
   theme(text = element_text(size=15),
         legend.position = "none") +
-  ylim(0, 12000) +
+  ylim(0, 10000) +
   ggtitle("\nlyrata side")
 
 #LL conditions, halleri side
@@ -447,7 +468,7 @@ DEG$dir[DEG$dir == 1] <- "up"
 DEG$dir[DEG$dir == -1] <- "down"
 
 LL_gghal <- ggplot(data = DEG, aes(x = generation, fill = dir)) +
-  geom_bar() +
+  geom_bar(width = 0.75) +
   scale_x_discrete(labels = c("NvsP1", "NvsS1", "NvsS4")) +
   xlab("Generation") +
   ylab("") +
@@ -472,14 +493,14 @@ DEG_lyr$dir[DEG_lyr$dir == 1] <- "up"
 DEG_lyr$dir[DEG_lyr$dir == -1] <- "down"
 
 LL_gglyr <- ggplot(data = DEG_lyr, aes(x = generation, fill = dir)) +
-  geom_bar() +
+  geom_bar(width = 0.75) +
   scale_x_discrete(labels = c("NvsP1", "NvsS1", "NvsS4")) +
   xlab("Generation") +
   ylab("") +
   theme_bw() +
   theme(text = element_text(size=15),
         legend.title = element_blank()) +
-  ylim(0, 12000) +
+  ylim(0, 10000) +
   ggtitle("\nlyrata side")
 
 
@@ -505,7 +526,7 @@ HM_DEG_hal$dir[HM_DEG_hal$dir == -1] <- "down"
 
 
 HM_gghal2 <- ggplot(data = HM_DEG_hal, aes(x = generation, fill = dir)) +
-  geom_bar() +
+  geom_bar(width = 0.75) +
   scale_x_discrete(labels = c("P", "S", "ALK", "TKS")) +
   xlab("Generation") +
   ylab("") +
@@ -513,7 +534,7 @@ HM_gghal2 <- ggplot(data = HM_DEG_hal, aes(x = generation, fill = dir)) +
   theme(text = element_text(size=15),
         legend.title = element_blank(),
         legend.position = "none") +
-  ylim(0, 7500) +
+  ylim(0, 6000) +
   ggtitle("\nhalleri side")
 
 # HM conditions - lyrata side
@@ -533,7 +554,7 @@ HM_DEG_lyr$dir[HM_DEG_lyr$dir == -1] <- "down"
 
 
 HM_gglyr2 <- ggplot(data = HM_DEG_lyr, aes(x = generation, fill = dir)) +
-  geom_bar() +
+  geom_bar(width = 0.75) +
   scale_x_discrete(labels = c("P", "S", "ALK", "TKS")) +
   xlab("Generation") +
   ylab("") +
@@ -541,7 +562,7 @@ HM_gglyr2 <- ggplot(data = HM_DEG_lyr, aes(x = generation, fill = dir)) +
   theme(text = element_text(size=15),
         legend.title = element_blank(),
         legend.position = "none") +
-  ylim(0, 7500) +
+  ylim(0, 6000) +
   ggtitle("\nlyrata side")
 
 # LL conditions - halleri  side
@@ -561,7 +582,7 @@ LL_DEG_hal$dir[LL_DEG_hal$dir == -1] <- "down"
 
 
 LL_gghal2 <- ggplot(data = LL_DEG_hal, aes(x = generation, fill = dir)) +
-  geom_bar() +
+  geom_bar(width = 0.75) +
   scale_x_discrete(labels = c("P", "S", "ALK", "TKS")) +
   xlab("Generation") +
   ylab("") +
@@ -569,7 +590,7 @@ LL_gghal2 <- ggplot(data = LL_DEG_hal, aes(x = generation, fill = dir)) +
   theme(text = element_text(size=15),
         legend.title = element_blank(),
         legend.position = "none") +
-  ylim(0, 7500) +
+  ylim(0, 6000) +
   ggtitle("\nhalleri side")
 
 # LL conditions - lyrata side
@@ -589,14 +610,64 @@ LL_DEG_lyr$dir[LL_DEG_lyr$dir == -1] <- "down"
 
 
 LL_gglyr2 <- ggplot(data = LL_DEG_lyr, aes(x = generation, fill = dir)) +
-  geom_bar() +
+  geom_bar(width = 0.75) +
   scale_x_discrete(labels = c("P", "S", "ALK", "TKS")) +
   xlab("Generation") +
   ylab("") +
   theme_bw() +
   theme(text = element_text(size=15),
         legend.title = element_blank()) +
-  ylim(0, 7500) +
+  ylim(0, 6000) +
   ggtitle("\nlyrata side")
 
 (HM_gghal2 + HM_gglyr2) | (LL_gghal2 + LL_gglyr2)
+
+# plotting DEG across conditions generations
+
+# create dataframe with data from all comparisons across conditions
+
+#HM & LL conditions, halleri side
+
+DEG <- rbind(HMvLL_synG1_hal_DEG_flt,
+             HMvLL_synG4_hal_DEG_flt)
+
+DEG <- mutate(DEG, generation = c(rep("S1", nrow(HMvLL_synG1_hal_DEG_flt)),
+                                  rep("S4", nrow(HMvLL_synG4_hal_DEG_flt))))
+
+DEG$dir[DEG$dir == 1] <- "up"
+DEG$dir[DEG$dir == -1] <- "down"
+
+
+HMLL_gghal <- ggplot(data = DEG, aes(x = generation, fill = as.factor(dir))) +
+  geom_bar(width = 0.75) +
+  xlab("") +
+  ylab("Count") +
+  theme_bw() +
+  theme(text = element_text(size=15),
+        legend.position = "none") +
+  ylim(0, 10000) +
+  ggtitle("Across conditions \nhalleri side")
+
+#HM & LL conditions, lyrata side
+
+DEG <- rbind(HMvLL_synG1_lyr_DEG_flt,
+             HMvLL_synG4_lyr_DEG_flt)
+
+DEG <- mutate(DEG, generation = c(rep("S1", nrow(HMvLL_synG1_lyr_DEG_flt)),
+                                  rep("S4", nrow(HMvLL_synG4_lyr_DEG_flt))))
+
+DEG$dir[DEG$dir == 1] <- "up"
+DEG$dir[DEG$dir == -1] <- "down"
+
+
+HMLL_gglyr <- ggplot(data = DEG, aes(x = generation, fill = as.factor(dir))) +
+  geom_bar(width = 0.75) +
+  xlab("") +
+  ylab("Count") +
+  theme_bw() +
+  theme(text = element_text(size=15),
+        legend.position = "none") +
+  ylim(0, 10000) +
+  ggtitle("Across conditions \nlyrata side")
+
+HMLL_gghal + HMLL_gglyr

@@ -1,0 +1,5 @@
+geneID	seqname	start	end	region_start	region_end	overlap_length	methylation_status
+AlMed_G023376	chr16	11646419	11647749	11647429	11647484	55	increase
+AlMed_G001809	chr9	7408051	7411159	7410175	7410659	484	decrease
+AlMed_G019749	chr13	1993972	2010820	1996545	1997173	628	increase
+AlMed_G005929	chr15	6102558	6106048	6103970	6104643	673	increase

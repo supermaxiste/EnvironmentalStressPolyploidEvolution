@@ -1,0 +1,57 @@
+GO.ID	Term	Annotated	Significant	Expected	elimFisher
+GO:0051640	organelle localization	123	7	1.7	0.0016
+GO:0042430	indole-containing compound metabolic process	64	5	0.89	0.0019
+GO:0032787	monocarboxylic acid metabolic process	420	13	5.82	0.0056
+GO:0071805	potassium ion transmembrane transport	55	4	0.76	0.0070
+GO:0010189	vitamin E biosynthetic process	10	2	0.14	0.0080
+GO:0080027	response to herbivore	10	2	0.14	0.0080
+GO:0043266	regulation of potassium ion transport	11	2	0.15	0.0097
+GO:0042401	biogenic amine biosynthetic process	33	3	0.46	0.0105
+GO:0009309	amine biosynthetic process	33	3	0.46	0.0105
+GO:0015770	sucrose transport	12	2	0.17	0.0115
+GO:0005992	trehalose biosynthetic process	12	2	0.17	0.0115
+GO:0052325	cell wall pectin biosynthetic process	12	2	0.17	0.0115
+GO:0009451	RNA modification	313	10	4.34	0.0119
+GO:0015766	disaccharide transport	13	2	0.18	0.0135
+GO:0015772	oligosaccharide transport	13	2	0.18	0.0135
+GO:0051656	establishment of organelle localization	68	4	0.94	0.0146
+GO:0046394	carboxylic acid biosynthetic process	425	12	5.89	0.0152
+GO:0016053	organic acid biosynthetic process	425	12	5.89	0.0152
+GO:0005991	trehalose metabolic process	14	2	0.19	0.0156
+GO:0140056	organelle localization by membrane tethering	40	3	0.55	0.0177
+GO:0022406	membrane docking	40	3	0.55	0.0177
+GO:0051667	establishment of plastid localization	16	2	0.22	0.0202
+GO:0010232	vascular transport	16	2	0.22	0.0202
+GO:0010233	phloem transport	16	2	0.22	0.0202
+GO:0009902	chloroplast relocation	16	2	0.22	0.0202
+GO:0003013	circulatory system process	16	2	0.22	0.0202
+GO:0003018	vascular process in circulatory system	16	2	0.22	0.0202
+GO:0003008	system process	16	2	0.22	0.0202
+GO:0042435	indole-containing compound biosynthetic process	45	3	0.62	0.0242
+GO:1901659	glycosyl compound biosynthetic process	45	3	0.62	0.0242
+GO:0009308	amine metabolic process	80	4	1.11	0.0249
+GO:0000162	tryptophan biosynthetic process	18	2	0.25	0.0252
+GO:0046219	indolalkylamine biosynthetic process	18	2	0.25	0.0252
+GO:0071555	cell wall organization	305	9	4.23	0.0262
+GO:0018958	phenol-containing compound metabolic process	47	3	0.65	0.0272
+GO:1901137	carbohydrate derivative biosynthetic process	359	10	4.97	0.0278
+GO:0006636	unsaturated fatty acid biosynthetic process	19	2	0.26	0.0280
+GO:0006081	cellular aldehyde metabolic process	48	3	0.67	0.0287
+GO:0071554	cell wall organization or biogenesis	413	11	5.72	0.0288
+GO:0033559	unsaturated fatty acid metabolic process	20	2	0.28	0.0308
+GO:0002239	response to oomycetes	50	3	0.69	0.0319
+GO:0006633	fatty acid biosynthetic process	128	5	1.77	0.0326
+GO:0006576	biogenic amine metabolic process	51	3	0.71	0.0335
+GO:1901658	glycosyl compound catabolic process	21	2	0.29	0.0337
+GO:0019750	chloroplast localization	21	2	0.29	0.0337
+GO:0051644	plastid localization	22	2	0.3	0.0368
+GO:0006631	fatty acid metabolic process	225	7	3.12	0.0372
+GO:0009751	response to salicylic acid	135	5	1.87	0.0396
+GO:0044255	cellular lipid metabolic process	602	14	8.34	0.0401
+GO:0045229	external encapsulating structure organization	330	9	4.57	0.0403
+GO:0046351	disaccharide biosynthetic process	24	2	0.33	0.0432
+GO:0008643	carbohydrate transport	96	4	1.33	0.0443
+GO:0052546	cell wall pectin metabolic process	25	2	0.35	0.0465
+GO:0006568	tryptophan metabolic process	25	2	0.35	0.0465
+GO:0006586	indolalkylamine metabolic process	25	2	0.35	0.0465
+GO:0000281	mitotic cytokinesis	26	2	0.36	0.0499

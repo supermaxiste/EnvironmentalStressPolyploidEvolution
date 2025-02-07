@@ -1,0 +1,37 @@
+GO.ID	Term	Annotated	Significant	Expected	elimFisher
+GO:0010038	response to metal ion	161	9	1.97	0.0022
+GO:0046653	tetrahydrofolate metabolic process	25	3	0.31	0.0034
+GO:0046500	S-adenosylmethionine metabolic process	10	2	0.12	0.0063
+GO:0009696	salicylic acid metabolic process	35	3	0.43	0.0088
+GO:0046688	response to copper ion	12	2	0.15	0.0090
+GO:0000041	transition metal ion transport	70	4	0.86	0.0105
+GO:0015851	nucleobase transport	13	2	0.16	0.0106
+GO:0044030	regulation of DNA methylation	14	2	0.17	0.0123
+GO:0035999	tetrahydrofolate interconversion	14	2	0.17	0.0123
+GO:0071103	DNA conformation change	43	3	0.53	0.0154
+GO:1901617	organic hydroxy compound biosynthetic process	166	6	2.03	0.0162
+GO:0051553	flavone biosynthetic process	17	2	0.21	0.0179
+GO:0006665	sphingolipid metabolic process	47	3	0.57	0.0196
+GO:0046148	pigment biosynthetic process	127	5	1.55	0.0197
+GO:0000966	RNA 5'-end processing	18	2	0.22	0.0200
+GO:0051552	flavone metabolic process	18	2	0.22	0.0200
+GO:0009697	salicylic acid biosynthetic process	18	2	0.22	0.0200
+GO:0010492	maintenance of shoot apical meristem identity	20	2	0.24	0.0244
+GO:0010380	regulation of chlorophyll biosynthetic process	20	2	0.24	0.0244
+GO:1901463	regulation of tetrapyrrole biosynthetic process	21	2	0.26	0.0267
+GO:0098727	maintenance of cell number	57	3	0.7	0.0324
+GO:0019827	stem cell population maintenance	57	3	0.7	0.0324
+GO:0046189	phenol-containing compound biosynthetic process	24	2	0.29	0.0343
+GO:0046686	response to cadmium ion	59	3	0.72	0.0353
+GO:0010224	response to UV-B	59	3	0.72	0.0353
+GO:0140115	export across plasma membrane	59	3	0.72	0.0353
+GO:0043603	amide metabolic process	737	15	9	0.0357
+GO:0006672	ceramide metabolic process	25	2	0.31	0.0370
+GO:0006952	defense response	938	18	11.46	0.0371
+GO:0090056	regulation of chlorophyll metabolic process	26	2	0.32	0.0398
+GO:0051276	chromosome organization	156	5	1.91	0.0424
+GO:0034614	cellular response to reactive oxygen species	27	2	0.33	0.0426
+GO:0006730	one-carbon metabolic process	27	2	0.33	0.0426
+GO:0007062	sister chromatid cohesion	27	2	0.33	0.0426
+GO:1901401	regulation of tetrapyrrole metabolic process	28	2	0.34	0.0455
+GO:0042440	pigment metabolic process	162	5	1.98	0.0485

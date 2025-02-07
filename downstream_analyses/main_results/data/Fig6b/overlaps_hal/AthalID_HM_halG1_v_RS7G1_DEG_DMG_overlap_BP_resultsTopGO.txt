@@ -1,0 +1,21 @@
+GO.ID	Term	Annotated	Significant	Expected	elimFisher
+GO:0006383	transcription by RNA polymerase III	33	3	0.31	0.0037
+GO:0110096	cellular response to aldehyde	10	2	0.1	0.0038
+GO:0032412	regulation of monoatomic ion transmembrane transporter activity	11	2	0.1	0.0047
+GO:0044070	regulation of monoatomic anion transport	11	2	0.1	0.0047
+GO:0006535	cysteine biosynthetic process from serine	12	2	0.11	0.0056
+GO:0006400	tRNA modification	77	4	0.73	0.0062
+GO:0055062	phosphate ion homeostasis	13	2	0.12	0.0065
+GO:0042908	xenobiotic transport	43	3	0.41	0.0078
+GO:0046185	aldehyde catabolic process	16	2	0.15	0.0098
+GO:0000966	RNA 5'-end processing	16	2	0.15	0.0098
+GO:0051650	establishment of vesicle localization	27	2	0.26	0.0269
+GO:0051648	vesicle localization	27	2	0.26	0.0269
+GO:0051156	glucose 6-phosphate metabolic process	27	2	0.26	0.0269
+GO:0019646	aerobic electron transport chain	29	2	0.28	0.0308
+GO:0042775	mitochondrial ATP synthesis coupled electron transport	30	2	0.29	0.0328
+GO:0042773	ATP synthesis coupled electron transport	31	2	0.29	0.0348
+GO:0006119	oxidative phosphorylation	32	2	0.3	0.0369
+GO:0016052	carbohydrate catabolic process	196	5	1.86	0.0390
+GO:0034765	regulation of monoatomic ion transmembrane transport	36	2	0.34	0.0457
+GO:0022904	respiratory electron transport chain	37	2	0.35	0.0481
