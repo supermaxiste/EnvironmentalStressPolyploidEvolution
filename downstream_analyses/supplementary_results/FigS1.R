@@ -610,7 +610,7 @@ LL_all_lyr <- rbind(LL_lyr_G1,
 homeo_condidates_HM_hal <- all_hal %>% filter(coverage > 9,
                                               sample == "HM_RS7_G4_hal")
 
-homeo_condidates_LL_hal <- LL_all_hal %>% filter(coverage > 7.5,
+homeo_condidates_LL_hal <- LL_all_hal %>% filter(coverage > 9,
                                                  sample == "LL_RS7K_G4_hal")
 
 homeo_condidates_HM_lyr <- all_lyr %>% filter(coverage < 2.5,
@@ -951,30 +951,30 @@ LL_both_chr1 + LL_both_chr2 +
 
 # we export coordinates of homeo and non homeo exchanges
 
-# write.table(homeo_HM_hal_overlap_continuous, 
-#             file = "homeo_HM_overlap_continuous.txt",
-#             row.names = F, quote = F)
+write.table(homeo_HM_hal_overlap_continuous,
+            file = "homeo_HM_overlap_continuous.txt",
+            row.names = F, quote = F)
 # 
 # saveRDS(homeo_HM_hal_overlap_continuous,
 #         file = "homeo_HM_overlap_continuous.Rdata")
 # 
-# write.table(homeo_LL_hal_overlap_continuous, 
-#             file = "homeo_LL_overlap_continuous.txt",
-#             row.names = F, quote = F)
+write.table(homeo_LL_hal_overlap_continuous,
+            file = "homeo_LL_overlap_continuous.txt",
+            row.names = F, quote = F)
 # 
 # saveRDS(homeo_LL_hal_overlap_continuous,
 #         file = "homeo_LL_overlap_continuous.Rdata")
 # 
-# write.table(nonhomeo_HM_overlap_continuous, 
-#             file = "nonhomeo_HM_overlap_continuous.txt",
-#             row.names = F, quote = F)
+write.table(nonhomeo_HM_overlap_continuous,
+            file = "nonhomeo_HM_overlap_continuous.txt",
+            row.names = F, quote = F)
 # 
 # saveRDS(nonhomeo_HM_overlap_continuous,
 #         file = "nonhomeo_HM_overlap_continuous.Rdata")
 # 
-# write.table(nonhomeo_LL_overlap_continuous, 
-#             file = "nonhomeo_LL_overlap_continuous.txt",
-#             row.names = F, quote = F)
+write.table(nonhomeo_LL_overlap_continuous,
+            file = "nonhomeo_LL_overlap_continuous.txt",
+            row.names = F, quote = F)
 # 
 # saveRDS(nonhomeo_LL_overlap_continuous,
 #         file = "nonhomeo_LL_overlap_continuous.Rdata")

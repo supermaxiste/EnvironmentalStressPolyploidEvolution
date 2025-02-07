@@ -58,10 +58,10 @@ Details: L41-42, L44-45 and L53 need to be changed to the path of the low covera
 
 ## Figure S8
 
-Package requirements:  
-Script:  
-Data:   
-Details: 
+Package requirements: TBD  
+Script: `FigS8_chisquare.R`  
+Data: from [ARPEGGIO analyses](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses) and [low coverage regions](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/downstream_analyses/main_results/data/Fig4c).  
+Details: L18 has to be set for the `ARPEGGIO_analyses` folder. L184-185 and L187-188 have paths to be changed for files about low coverage regions.  
 
 ## Figure S9
 

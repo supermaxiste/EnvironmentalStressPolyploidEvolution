@@ -95,11 +95,11 @@ dmrseq_output_CHH_lyr_sig_G <- GRanges(seqnames = dmrseq_output_CHH_lyr_sig$seqn
                                                         end = dmrseq_output_CHH_lyr_sig$end))
 
 overlapCG_lyr <- unique(findOverlaps(dmrseq_output_CG_lyr_sig_G, HM_lyr_lowC_scaffolds_G)@from)
-dmrseq_output_CG_lyr_sig <- dmrseq_output_CG_lyr_sig[-c(overlapCG_lyr),]
+#dmrseq_output_CG_lyr_sig <- dmrseq_output_CG_lyr_sig[-c(overlapCG_lyr),]
 overlapCHG_lyr <- unique(findOverlaps(dmrseq_output_CHG_lyr_sig_G, HM_lyr_lowC_scaffolds_G)@from)
-dmrseq_output_CHG_lyr_sig <- dmrseq_output_CHG_lyr_sig[-c(overlapCHG_lyr),]
+#dmrseq_output_CHG_lyr_sig <- dmrseq_output_CHG_lyr_sig[-c(overlapCHG_lyr),]
 overlapCHH_lyr <- unique(findOverlaps(dmrseq_output_CHH_lyr_sig_G, HM_lyr_lowC_scaffolds_G)@from)
-dmrseq_output_CHH_lyr_sig <- dmrseq_output_CHH_lyr_sig[-c(overlapCHH_lyr),]
+#dmrseq_output_CHH_lyr_sig <- dmrseq_output_CHH_lyr_sig[-c(overlapCHH_lyr),]
 
 ## Count regions showing increase or decrease in methylation
 
@@ -119,10 +119,10 @@ species <- c(rep("halleri", 6), rep("lyrata", 6))
 
 hypo_hyper <- c(rep("hyper", 3), rep("hypo", 3), rep("hyper", 3), rep("hypo", 3))
 
-value <- c(table(CG_hal)[2], table(CHG_hal)[2], table(CHH_hal)[2],
+value <- c(table(CG_hal)[2], table(CHG_hal)[2], 0, #only decrease in CHH hal
            table(CG_hal)[1], table(CHG_hal)[1], table(CHH_hal)[1],
-           table(CG_lyr)[2], table(CHG_lyr)[2], table(CHH_lyr)[2],
-           table(CG_lyr)[1], table(CHG_lyr)[1], table(CHH_lyr)[1])
+           table(CG_lyr)[1], table(CHG_lyr)[2], 0, #only decrease in CHH lyr
+           0, table(CHG_lyr)[1], table(CHH_lyr)[1])
 
 comparison <- c(rep("progenitors", 12))
 

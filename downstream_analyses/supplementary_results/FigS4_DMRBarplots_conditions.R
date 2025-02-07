@@ -9,7 +9,7 @@ library(patchwork)
 
 ## Import data
 
-setwd("ARPEGGIO_results_syn1_HMvLL/")
+setwd("MILD_v_STRESS_syn1/dmrseq/")
 dmrseq_output_CG_AvB <- fread("CG_context/A_v_B_polyploid.txt")
 dmrseq_output_CHG_AvB <- fread("CHG_context/A_v_B_polyploid.txt")
 dmrseq_output_CHH_AvB <- fread("CHH_context/A_v_B_polyploid.txt")
@@ -62,7 +62,7 @@ CHH_lyr <- 0
 
 context <- rep(c("CG", "CHG", "CHH"), 2)
 
-species <- c(rep("halleri", 3), rep("lyrata", 3))
+species <- c(rep("halleri", 6), rep("lyrata", 6))
 
 hypo_hyper <- c(rep("hyper", 3), rep("hypo", 3), rep("hyper", 3), rep("hypo", 3))
 
@@ -117,7 +117,7 @@ ggplot(dmrs_context_total, aes(x=context, y=value)) +
 
 ## Import data
 
-setwd("~/OneDrive/PhD/Project/Chapter_3/new_DMR_results/ARPEGGIO_results_syn4_HMvLL")
+setwd("MILD_v_STRESS_syn4/dmrseq/")
 dmrseq_output_CG_AvB <- fread("CG_context/A_v_B_polyploid.txt")
 dmrseq_output_CHG_AvB <- fread("CHG_context/A_v_B_polyploid.txt")
 dmrseq_output_CHH_AvB <- fread("CHH_context/A_v_B_polyploid.txt")
@@ -160,9 +160,9 @@ CHH_lyr <- ifelse(dmrseq_output_CHH_lyr_sig$stat>0, "decrease", "increase")
 
 ## Fourth generation
 
-context <- rep(c("CG", "CHG", "CHH"), 2)
+context <- rep(c("CG", "CHG", "CHH"), 4)
 
-species <- c(rep("halleri", 3), rep("lyrata", 3))
+species <- c(rep("halleri", 6), rep("lyrata", 6))
 
 hypo_hyper <- c(rep("hyper", 3), rep("hypo", 3), rep("hyper", 3), rep("hypo", 3))
 
@@ -199,8 +199,8 @@ ggplot(dmrs_context_total, aes(x=context, y=value)) +
   geom_col(width = 0.5, show.legend = TRUE, position = "stack", 
            aes(col = hypo_hyper)) +
   #scale_fill_manual(values=cbPalette) +
+  facet_wrap(~species, labeller = labeller(species = species.labs)) +
   scale_color_manual(labels = c("hypo", "hyper"), values=c("white", "black")) +
-  facet_grid(~species, labeller = labeller(species = species.labs)) +
   ylab("Number of DMRs") +
   theme_bw() +
   theme(legend.title = element_blank(), text = element_text(size=25),
