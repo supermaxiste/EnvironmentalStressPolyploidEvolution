@@ -79,6 +79,21 @@ Data: `dmrseq` output from the ARPEGGIO pipeline, specifically alk & tks generat
   - [STRESS_tks1_v_syn4](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_tks1_v_syn4)   
 Details: the script changes working directory 12 times, one for each of the outputs outlined above and requires 4 paths to the data in `data/Fig4c`. Make sure to set the correct paths for lines 13, 33, 35, 99, 189, 329, 408, 497, 638, 658, 660, 725, 814, 954, 1033 and 1122.
 
+## Figure 4
+
+### Figure 4abc
+
+Package requirements: `tidyverse`, `data.table`, `patchwork` and `GenomicRanges`  
+Script: `Fig4abc_DMRs_g4v1.R`.  
+Data: `dmrseq` output from the ARPEGGIO pipeline, specifically progenitors and naturals where we compare generation 1 vs generation 4 (both conditions):
+  - [MILD_pro1_v_pro4](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_pro1_v_pro4)
+  - [MILD_alk1_v_alk4](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_alk1_v_alk4)
+  - [MILD_tks1_v_tks5](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_tks1_v_tks5)
+  - [STRESS_pro1_v_pro4](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_pro1_v_pro4)
+  - [STRESS_alk1_v_alk4](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_alk1_v_alk4)
+  - [STRESS_tks1_v_tks5](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_tks1_v_tks5)  
+Details: L15 path to `MILD_alk1_v_alk4` output, L159 path to `STRESS_alk1_v_alk4` output. L189-190 to `data/Fig4c`. L303 and L443 for `MILD_tks1_v_tks5` and `STRESS_tks1_v_tks5` output respectively. L582 and L586 for `MILD_pro1_v_pro4` for each parental side. L711 and L715 for `STRESS_pro1_v_pro4` for each parental side.
+
 ## Figure 5
 
 Package requirements: `grid`, `gridExtra`, `tidyverse`, `data.table`, `GenomicRanges` and `patchwork`  
