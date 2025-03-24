@@ -1,0 +1,340 @@
+Checking Working Directory ... PASS: `results/genespace/run_dir`
+Checking user-defined parameters ...
+	Genome IDs & ploidy ... 
+		A.halleri   : 1
+		A.lyrata    : 1
+		A.lyrata_NT1: 1
+		A.lyrata_jgi: 1
+		A.thaliana  : 1
+	Outgroup ... NONE
+	n. parallel processes ... 2
+	collinear block size ... 5
+	collinear block search radius ... 25
+	n gaps in collinear block ... 5
+	synteny buffer size... 100
+	only orthogroups hits as anchors ... TRUE
+	n secondary hits ... 0
+Checking annotation files (.bed and peptide .fa):
+	A.halleri   : 29894 / 29894 geneIDs exactly match (PASS)
+	A.lyrata    : 27602 / 27602 geneIDs exactly match (PASS)
+	A.lyrata_NT1: 28937 / 28937 geneIDs exactly match (PASS)
+	A.lyrata_jgi: 30126 / 31073 geneIDs exactly match (PASS)
+	A.thaliana  : 27206 / 27416 geneIDs exactly match (PASS)
+Checking dependencies ...
+	Found valid path to OrthoFinder v2.55: `orthofinder`
+	Found valid path to DIAMOND2 v2.111: `diamond`
+	Found valid MCScanX_h executable: `results/genespace/MCScanX//MCScanX_h`
+
+############################
+1. Running orthofinder (or parsing existing results)
+	Checking for existing orthofinder results ...
+        Copying files over to the temporary directory:
+                results/genespace/run_dir/tmp
+        Running the following command in the shell: `orthofinder -f
+                results/genespace/run_dir/tmp -t 2 -a 1 -X -o
+                results/genespace/run_dir/orthofinder`.This can take a
+                while. To check the progress, look in the
+                `WorkingDirectory` in the output (-o) directory
+	
+	
+	OrthoFinder version 2.5.5 Copyright (C) 2014 David Emms
+	
+	2025-03-12 10:13:39 : Starting OrthoFinder 2.5.5
+	2 thread(s) for highly parallel tasks (BLAST searches etc.)
+	1 thread(s) for OrthoFinder algorithm
+	
+	Checking required programs are installed
+	----------------------------------------
+	Test can run "mcl -h" - ok
+	Test can run "fastme -i results/genespace/run_dir/orthofinder/Results_Mar12/WorkingDirectory/dependencies/SimpleTest.phy -o results/genespace/run_dir/orthofinder/Results_Mar12/WorkingDirectory/dependencies/SimpleTest.tre" - ok
+	
+	Dividing up work for BLAST for parallel processing
+	--------------------------------------------------
+	2025-03-12 10:13:40 : Creating diamond database 1 of 5
+	2025-03-12 10:13:40 : Creating diamond database 2 of 5
+	2025-03-12 10:13:41 : Creating diamond database 3 of 5
+	2025-03-12 10:13:41 : Creating diamond database 4 of 5
+	2025-03-12 10:13:41 : Creating diamond database 5 of 5
+	
+	Running diamond all-versus-all
+	------------------------------
+	Using 2 thread(s)
+	2025-03-12 10:13:41 : This may take some time....
+	2025-03-12 10:13:41 : Done 0 of 25
+	2025-03-12 10:32:46 : Done 10 of 25
+	2025-03-12 10:51:41 : Done 20 of 25
+	2025-03-12 11:02:14 : Done all-versus-all sequence search
+	
+	Running OrthoFinder algorithm
+	-----------------------------
+	2025-03-12 11:02:15 : Initial processing of each species
+	2025-03-12 11:02:25 : Initial processing of species 0 complete
+	2025-03-12 11:02:35 : Initial processing of species 1 complete
+	2025-03-12 11:02:44 : Initial processing of species 2 complete
+	2025-03-12 11:02:54 : Initial processing of species 3 complete
+	2025-03-12 11:03:04 : Initial processing of species 4 complete
+	2025-03-12 11:03:10 : Connected putative homologues
+	2025-03-12 11:03:11 : Written final scores for species 0 to graph file
+	2025-03-12 11:03:12 : Written final scores for species 1 to graph file
+	2025-03-12 11:03:14 : Written final scores for species 2 to graph file
+	2025-03-12 11:03:15 : Written final scores for species 3 to graph file
+	2025-03-12 11:03:16 : Written final scores for species 4 to graph file
+	2025-03-12 11:03:27 : Ran MCL
+	
+	Writing orthogroups to file
+	---------------------------
+	OrthoFinder assigned 139895 genes (96.5% of total) to 26402 orthogroups. Fifty percent of all genes were in orthogroups with 5 or more genes (G50 was 5) and were contained in the largest 9757 orthogroups (O50 was 9757). There were 16736 orthogroups with all species present and 12149 of these consisted entirely of single-copy genes.
+	
+	2025-03-12 11:03:34 : Done orthogroups
+	
+	Analysing Orthogroups
+	=====================
+	
+	Calculating gene distances
+	--------------------------
+	2025-03-12 11:04:19 : Done
+	2025-03-12 11:04:19 : Done 0 of 21283
+	2025-03-12 11:04:28 : Done 1000 of 21283
+	2025-03-12 11:04:36 : Done 2000 of 21283
+	2025-03-12 11:04:44 : Done 3000 of 21283
+	2025-03-12 11:04:53 : Done 4000 of 21283
+	2025-03-12 11:05:02 : Done 5000 of 21283
+	2025-03-12 11:05:11 : Done 6000 of 21283
+	2025-03-12 11:05:19 : Done 7000 of 21283
+	2025-03-12 11:05:27 : Done 8000 of 21283
+	2025-03-12 11:05:36 : Done 9000 of 21283
+	2025-03-12 11:05:45 : Done 10000 of 21283
+	2025-03-12 11:05:53 : Done 11000 of 21283
+	2025-03-12 11:06:02 : Done 12000 of 21283
+	2025-03-12 11:06:11 : Done 13000 of 21283
+	2025-03-12 11:06:20 : Done 14000 of 21283
+	2025-03-12 11:06:29 : Done 15000 of 21283
+	2025-03-12 11:06:37 : Done 16000 of 21283
+	2025-03-12 11:06:46 : Done 17000 of 21283
+	2025-03-12 11:06:54 : Done 18000 of 21283
+	2025-03-12 11:07:05 : Done 19000 of 21283
+	2025-03-12 11:07:15 : Done 20000 of 21283
+	2025-03-12 11:07:24 : Done 21000 of 21283
+	
+	Inferring gene and species trees
+	--------------------------------
+	
+	16736 trees had all species present and will be used by STAG to infer the species tree
+	
+	Best outgroup(s) for species tree
+	---------------------------------
+	2025-03-12 11:12:37 : Starting STRIDE
+	2025-03-12 11:12:39 : Done STRIDE
+	Observed 138 well-supported, non-terminal duplications. 78 support the best root and 60 contradict it.
+	Best outgroup for species tree:
+	  A.halleri
+	
+	Reconciling gene trees and species tree
+	---------------------------------------
+	Outgroup: A.halleri
+	2025-03-12 11:12:39 : Starting Recon and orthologues
+	2025-03-12 11:12:39 : Starting OF Orthologues
+	2025-03-12 11:12:40 : Done 0 of 21283
+	2025-03-12 11:12:42 : Done 1000 of 21283
+	2025-03-12 11:12:44 : Done 2000 of 21283
+	2025-03-12 11:12:45 : Done 3000 of 21283
+	2025-03-12 11:12:46 : Done 4000 of 21283
+	2025-03-12 11:12:47 : Done 5000 of 21283
+	2025-03-12 11:12:48 : Done 6000 of 21283
+	2025-03-12 11:12:49 : Done 7000 of 21283
+	2025-03-12 11:12:50 : Done 8000 of 21283
+	2025-03-12 11:12:51 : Done 9000 of 21283
+	2025-03-12 11:12:52 : Done 10000 of 21283
+	2025-03-12 11:12:52 : Done 11000 of 21283
+	2025-03-12 11:12:53 : Done 12000 of 21283
+	2025-03-12 11:12:54 : Done 13000 of 21283
+	2025-03-12 11:12:55 : Done 14000 of 21283
+	2025-03-12 11:12:56 : Done 15000 of 21283
+	2025-03-12 11:12:57 : Done 16000 of 21283
+	2025-03-12 11:12:58 : Done 17000 of 21283
+	2025-03-12 11:12:59 : Done 18000 of 21283
+	2025-03-12 11:13:00 : Done 19000 of 21283
+	2025-03-12 11:13:01 : Done 20000 of 21283
+	2025-03-12 11:13:01 : Done 21000 of 21283
+	2025-03-12 11:13:02 : Done OF Orthologues
+	
+	Writing results files
+	=====================
+	2025-03-12 11:13:08 : Done orthologues
+	
+	Results:
+	    results/genespace/run_dir/orthofinder/Results_Mar12/
+	
+	CITATION:
+	 When publishing work that uses OrthoFinder please cite:
+	 Emms D.M. & Kelly S. (2019), Genome Biology 20:238
+	
+	 If you use the species tree in your work then please also cite:
+	 Emms D.M. & Kelly S. (2017), MBE 34(12): 3267-3278
+	 Emms D.M. & Kelly S. (2018), bioRxiv https://doi.org/10.1101/267914
+############################
+2. Combining and annotating bed files w/ OGs and tandem array info ...
+	##############
+	Flagging chrs. w/ < 10 unique orthogroups
+	...A.halleri   :   0 genes on  0 small chrs. 
+ 	...A.lyrata    :   0 genes on  0 small chrs. 
+ 	...A.lyrata_NT1: 141 genes on 79 small chrs. 
+ 	...A.lyrata_jgi:   0 genes on  0 small chrs. 
+ 	...A.thaliana  :   0 genes on  0 small chrs. 
+	##############
+	Flagging over-dispered OGs
+	...A.halleri   :  61 genes in  5 OGs hit > 8 unique places 
+ 	...A.lyrata    :  11 genes in  1 OGs hit > 8 unique places 
+ 	...A.lyrata_NT1:  94 genes in  7 OGs hit > 8 unique places 
+ 	...A.lyrata_jgi: 190 genes in 13 OGs hit > 8 unique places 
+ 	...A.thaliana  : 120 genes in  7 OGs hit > 8 unique places 
+	##############
+	Annotation summaries (after exclusions):
+	...A.halleri   : 29833 genes in 26417 OGs || 3061 genes in 1187 arrays
+ 	...A.lyrata    : 27591 genes in 25092 OGs || 2277 genes in  964 arrays
+ 	...A.lyrata_NT1: 28702 genes in 26942 OGs || 1287 genes in  579 arrays
+ 	...A.lyrata_jgi: 29936 genes in 27211 OGs || 2175 genes in  982 arrays
+ 	...A.thaliana  : 27086 genes in 24488 OGs || 2252 genes in  949 arrays
+
+############################
+3. Combining and annotating the blast files with orthogroup info ...
+	# Chunk 1 / 8 (11:13:19) ... 
+	...A.lyrata_jgi v. A.lyrata_jgi: total hits = 352696, same og = 40626
+ 	...A.lyrata_jgi v. A.halleri:    total hits = 432497, same og = 26388
+	# Chunk 2 / 8 (11:13:24) ... 
+	...A.halleri v. A.halleri:       total hits = 370861, same og = 45977
+ 	...A.lyrata_jgi v. A.lyrata:     total hits = 416184, same og = 26644
+	# Chunk 3 / 8 (11:13:28) ... 
+	...A.lyrata_jgi v. A.thaliana:   total hits = 404254, same og = 27982
+ 	...A.halleri v. A.lyrata:        total hits = 429911, same og = 26719
+	# Chunk 4 / 8 (11:13:34) ... 
+	...A.lyrata_jgi v. A.lyrata_NT1: total hits = 404852, same og = 31324
+ 	...A.lyrata v. A.lyrata:         total hits = 333942, same og = 35673
+	# Chunk 5 / 8 (11:13:38) ... 
+	...A.halleri v. A.thaliana:      total hits = 407941, same og = 23722
+ 	...A.thaliana v. A.thaliana:     total hits = 319219, same og = 38248
+	# Chunk 6 / 8 (11:13:43) ... 
+	...A.halleri v. A.lyrata_NT1:    total hits = 403734, same og = 23549
+ 	...A.lyrata v. A.thaliana:       total hits = 392171, same og = 23827
+	# Chunk 7 / 8 (11:13:49) ... 
+	...A.thaliana v. A.lyrata_NT1:   total hits = 378911, same og = 25465
+ 	...A.lyrata v. A.lyrata_NT1:     total hits = 387792, same og = 24720
+	# Chunk 8 / 8 (11:13:53) ... 
+	...A.lyrata_NT1 v. A.lyrata_NT1: total hits = 307373, same og = 35044
+	##############
+	Generating dotplots for all hits ... Done!
+
+############################
+4. Flagging synteny for each pair of genomes ...
+	# Chunk 1 / 8 (11:14:39) ... 
+	...A.lyrata_jgi v. A.lyrata_NT1: 36855 hits (24128 anchors) in 67 blocks (58 SVs, 24 regions)
+ 	...A.lyrata_jgi v. A.thaliana:   32929 hits (21056 anchors) in 66 blocks (54 SVs, 44 regions)
+	# Chunk 2 / 8 (11:15:24) ... 
+	...A.halleri v. A.lyrata:        38760 hits (20548 anchors) in 63 blocks (52 SVs, 27 regions)
+ 	...A.lyrata_jgi v. A.lyrata:     36680 hits (21036 anchors) in 53 blocks (42 SVs, 25 regions)
+	# Chunk 3 / 8 (11:16:12) ... 
+	...A.lyrata_jgi v. A.halleri:    37374 hits (20709 anchors) in 86 blocks (78 SVs, 33 regions)
+ 	...A.thaliana v. A.lyrata_NT1:   31339 hits (20380 anchors) in 59 blocks (47 SVs, 29 regions)
+	# Chunk 4 / 8 (11:16:53) ... 
+	...A.lyrata v. A.lyrata_NT1:     34631 hits (20600 anchors) in 18 blocks (9 SVs, 12 regions)
+ 	...A.lyrata v. A.thaliana:       32232 hits (19082 anchors) in 55 blocks (43 SVs, 33 regions)
+	# Chunk 5 / 8 (11:17:34) ... 
+	...A.halleri v. A.thaliana:      33209 hits (19252 anchors) in 69 blocks (57 SVs, 42 regions)
+ 	...A.halleri v. A.lyrata_NT1:    34838 hits (19717 anchors) in 58 blocks (49 SVs, 22 regions)
+	# Chunk 6 / 8 (11:18:14) ... 
+	...A.halleri v. A.halleri:       67450 hits (29850 anchors) in 8 blocks (0 SVs, 0 regions)
+ 	...A.lyrata_jgi v. A.lyrata_jgi: 54119 hits (30110 anchors) in 8 blocks (0 SVs, 0 regions)
+	# Chunk 7 / 8 (11:18:26) ... 
+	...A.thaliana v. A.thaliana:     47626 hits (27202 anchors) in 5 blocks (0 SVs, 0 regions)
+ 	...A.lyrata v. A.lyrata:         55278 hits (27598 anchors) in 8 blocks (0 SVs, 0 regions)
+	# Chunk 8 / 8 (11:18:35) ... 
+	...A.lyrata_NT1 v. A.lyrata_NT1: 46257 hits (28824 anchors) in 87 blocks (0 SVs, 0 regions)
+
+############################
+5. Building synteny-constrained orthogroups ...
+	Done!
+
+############################
+6. Integrating syntenic positions across genomes ...
+	##############
+	Generating syntenic dotplots ... Done!
+	##############
+	Interpolating syntenic positions of genes ... 
+	A.halleri:  (0 / 1 / 2 / >2 syntenic positions)
+		A.halleri   :     0 / 29855 /     0 /     0
+		A.lyrata    :   115 / 26149 /    14 /     0
+		A.lyrata_NT1:    87 / 27903 /     4 /     0
+		A.lyrata_jgi:   166 / 28571 /     6 /     0
+		A.thaliana  :    84 / 25694 /     5 /     0
+	A.lyrata:  (0 / 1 / 2 / >2 syntenic positions)
+		A.halleri   :   141 / 27804 /    14 /     0
+		A.lyrata    :     0 / 27602 /     0 /     0
+		A.lyrata_NT1:    25 / 27965 /     4 /     0
+		A.lyrata_jgi:   108 / 28578 /    57 /     0
+		A.thaliana  :   113 / 25666 /     4 /     0
+	A.lyrata_NT1:  (0 / 1 / 2 / >2 syntenic positions)
+		A.halleri   :   145 / 27814 /     0 /     0
+		A.lyrata    :    48 / 26230 /     0 /     0
+		A.lyrata_NT1:     0 / 28937 /     0 /     0
+		A.lyrata_jgi:   218 / 28525 /     0 /     0
+		A.thaliana  :   106 / 25677 /     0 /     0
+	A.lyrata_jgi:  (0 / 1 / 2 / >2 syntenic positions)
+		A.halleri   :   366 / 27593 /     0 /     0
+		A.lyrata    :   146 / 26119 /    13 /     0
+		A.lyrata_NT1:   195 / 27793 /     6 /     0
+		A.lyrata_jgi:     0 / 30126 /     0 /     0
+		A.thaliana  :   211 / 25572 /     0 /     0
+	A.thaliana:  (0 / 1 / 2 / >2 syntenic positions)
+		A.halleri   :   230 / 27729 /     0 /     0
+		A.lyrata    :   191 / 26087 /     0 /     0
+		A.lyrata_NT1:   151 / 27843 /     0 /     0
+		A.lyrata_jgi:   198 / 28545 /     0 /     0
+		A.thaliana  :     0 / 27206 /     0 /     0
+	Done!
+
+############################
+7. Final block coordinate calculation and riparian plotting ...
+	##############
+	Calculating syntenic blocks by reference chromosomes ... 
+		n regions (aggregated by 25 gene radius): 624
+		n blocks (collinear sets of > 5 genes): 1122
+	##############
+	Building ref.-phased blks and riparian plots for haploid genomes:
+		A.halleri   : 640 phased blocks
+		A.lyrata    : 656 phased blocks
+		A.lyrata_NT1: 632 phased blocks
+		A.lyrata_jgi: 640 phased blocks
+		A.thaliana  : 676 phased blocks
+	Done!
+
+############################
+8. Constructing syntenic pan-gene sets ...
+	A.halleri   : n pos. = 44463, synOgs = 137529, array mem. = 6300, NS orthos 36741
+	A.lyrata    : n pos. = 44478, synOgs = 137622, array mem. = 6222, NS orthos 35758
+	A.lyrata_NT1: n pos. = 44447, synOgs = 137616, array mem. = 6157, NS orthos 35772
+	A.lyrata_jgi: n pos. = 44457, synOgs = 137645, array mem. = 6162, NS orthos 35442
+	A.thaliana  : n pos. = 44456, synOgs = 137704, array mem. = 6099, NS orthos 35531
+
+############################
+GENESPACE run complete!  All results are stored in
+results/genespace/run_dir in the following subdirectories:
+	syntenic block dotplots: /dotplots (...synHits.pdf)
+	annotated blast files  : /syntenicHits
+	annotated/combined bed : /results/combBed.txt
+	syntenic block coords. : /results/blkCoords.txt
+	syn. blk. by ref genome: /riparian/refPhasedBlkCoords.txt
+	pan-genome annotations : /pangenes (...pangenes.txt.gz)
+	riparian plots         : /riparian
+	genespace param. list  : /results/gsParams.rda
+############################
+**NOTE** the genespace parameter object is returned or can be loaded
+        into R via
+        `load('results/genespace/run_dir/results/gsParams.rda', verbose
+        = TRUE)`. Then you can customize your riparian plots by calling
+        `plot_riparian(gsParam = gsParam, ...)`. The source data and
+        ggplot2 objects are also stored in the /riparian directory and
+        can also be accessed by `load(...)`.
+**NOTE** To query genespace results by position or gene, use
+        `query_genespace(...)`. See specifications in ?query_genespace
+        for details.
+############################

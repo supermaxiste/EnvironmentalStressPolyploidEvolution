@@ -1,0 +1,101 @@
+******************
+* snake-GENESPACE *
+******************
+
+
+Reproducibility report for snake-GENESPACE.
+Run date & time: 2025-03-12 11:22:11
+Number of allocated cores: 2
+
+
+********************
+* Operating System *
+********************
+
+
+Operating System: macOS
+ProductName:		macOS
+ProductVersion:		14.4
+BuildVersion:		23E214
+
+
+**************
+* INPUT DATA *
+**************
+
+
+Mac md5 checksums for the input files
+A.halleri
+(../input_dir/A.halleri/.DS_Store)	194577a7e20bdcc7afbb718f502c134c
+(../input_dir/A.halleri/A.halleri_chr_only.fa)	9df416da2ece1841934c2a180f57a6d5
+(../input_dir/A.halleri/A.halleri.gff)	8abc2179ea061fe36638b25311540478
+Mac md5 checksums for the input files
+A.lyrata
+(../input_dir/A.lyrata/.DS_Store)	194577a7e20bdcc7afbb718f502c134c
+(../input_dir/A.lyrata/A.lyrata.gff)	3bd6e399c26c28cd4a70c3b93c5e7698
+(../input_dir/A.lyrata/A.lyrata_chr_only.fa)	2196214f04b5f474b4eec36eaf6a96d7
+Mac md5 checksums for the input files
+A.lyrata_NT1
+(../input_dir/A.lyrata_NT1/NT1_220222_fin.gff3)	03d3070509d8cd1bf16e1312bdc15441
+(../input_dir/A.lyrata_NT1/NT1_220222.fasta)	f738e6da3e4c073d5390a437f79e3093
+(../input_dir/A.lyrata_NT1/NT1_220222.fasta.index)	be251ea930c59b48f23473baf6d21389
+Mac md5 checksums for the input files
+bed
+(../input_dir/bed/A.lyrata_jgi.bed)	f4402b9b8297c79b5e42f3eb3f323bf5
+(../input_dir/bed/.DS_Store)	194577a7e20bdcc7afbb718f502c134c
+(../input_dir/bed/A.thaliana.bed)	5785307472e7dd885cfc9de204799a72
+Mac md5 checksums for the input files
+peptide
+(../input_dir/peptide/A.lyrata_jgi.fa)	94f0ffd10802ff01f468014ce17c0518
+(../input_dir/peptide/.DS_Store)	194577a7e20bdcc7afbb718f502c134c
+(../input_dir/peptide/A.thaliana.fa)	a8b97ad8800141b2488d26d691bbcf6b
+
+
+*********
+* TOOLS *
+*********
+
+
+snake-GENESPACE=0.1.0-alpha
+GENESPACE=1.2.3
+MCScanX=No version, Created (or last modified) on 
+git=2.45.2
+r-base=4.3
+perl=5.32.1
+orthofinder=2.5.5
+agat=1.4.0
+fastx_toolkit=0.0.14
+r-devtools=2.4.5
+bioconductor-Biostrings=2.70
+bioconductor-rtracklayer=1.62
+make=4.2.1
+r-mass=7.3.60.0.1
+r-ggplot2=3.5.1
+r-r.utils=2.12
+r-generics=0.1.3
+r-igraph=2.0.3
+r-dbscan=1.1
+r-data.table=1.15
+
+
+****************
+* OUTPUT FILES *
+****************
+
+
+Mac md5 checksums for the input files
+
+(results/genespace/run_dir/bed/A.lyrata_jgi.bed)	f4402b9b8297c79b5e42f3eb3f323bf5
+(results/genespace/run_dir/bed/A.lyrata_NT1.bed)	02093c34134110f7cd555110ba8a3534
+(results/genespace/run_dir/bed/A.halleri.bed)	446ba42ce3553b332b29d6b752abcd26
+(results/genespace/run_dir/bed/A.lyrata.bed)	238b2dc7b3298a6eb464384f5503cb5e
+(results/genespace/run_dir/bed/A.thaliana.bed)	5785307472e7dd885cfc9de204799a72
+
+(results/genespace/run_dir/peptide/A.lyrata_jgi.fa)	94f0ffd10802ff01f468014ce17c0518
+(results/genespace/run_dir/peptide/A.thaliana.fa)	a8b97ad8800141b2488d26d691bbcf6b
+(results/genespace/run_dir/peptide/A.lyrata_NT1.fa)	4a9a1ff9b1ec850d0278afda6f7e7bd2
+(results/genespace/run_dir/peptide/A.halleri.fa)	b9e4d2893a8a83a7803ab0f2f76bd3af
+(results/genespace/run_dir/peptide/A.lyrata.fa)	6f823530ae4a54ab93e3f4471af64954
+
+(results/genespace/run_dir/results/syntenicRegion_coordinates.csv)	3944194992f669e03316f664da000d9c
+(results/genespace/run_dir/results/syntenicBlock_coordinates.csv)	0b694f63f6bd92888dbac288300baf94
