@@ -118,5 +118,5 @@ Additional scripts can be found in this directory:
 
 ## OUTPUTS: 
 
-You can find the snake-GENESPACE reproducibility report and run logs in the results directory. Other snake-GENESPACE outputs were not included due to their large size.
+You can find the snake-GENESPACE reproducibility report in this directory. Other snake-GENESPACE outputs were not included due to their large size.
 
