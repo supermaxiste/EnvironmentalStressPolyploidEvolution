@@ -58,7 +58,7 @@ peptide
 
 snake-GENESPACE=0.1.0-alpha
 GENESPACE=1.2.3
-MCScanX=No version, Created (or last modified) on 
+MCScanX=No version, Created (or last modified) on 2025-03-12
 git=2.45.2
 r-base=4.3
 perl=5.32.1
