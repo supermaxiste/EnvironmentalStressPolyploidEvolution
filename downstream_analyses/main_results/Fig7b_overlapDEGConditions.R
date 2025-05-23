@@ -15,7 +15,7 @@ library(svglite)
 # Folder with differentially expressed genes
 DEG_folder <- c("path/to/deg_files_folder/")
 # Folder with list of low coverage genes
-lowC <- c("path/to/downstream_analyses/main_results/data/Fig5a/")
+lowC <- c("path/to/downstream_analyses/main_results/data/Fig7a/")
 
 # import low coverage genes list
 

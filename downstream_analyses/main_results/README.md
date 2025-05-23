@@ -108,22 +108,22 @@ Script: `Fig6_ExpressionHeatmaps.R`
 Data: `data/Fig6`, including classical genome annotation files and count tables  
 Details: the script requires to define paths in L13-19 for the annotations, count tables and data from `data/Fig6`.
 
-## Figure 8
+## Figure 7
 
-### Figure 8a
+### Figure 7a
 
 Package requirements: `tidyverse`, `patchwork` , `VennDiagram`, `ggVennDiagram`, `RColorBrewer` and `svglite`  
-Script: `Fig8a_OverlapDEGDMG.R`  
+Script: `Fig7a_OverlapDEGDMG.R`  
 Data: `dmrseq` output from the ARPEGGIO pipeline, specifically synthetics generations 1 & 4 vs progenitors from generation 1 (both conditions):
   - [MILD_syn1_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_syn1_v_pro1)
   - [MILD_syn4_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_syn4_v_pro1)
   - [STRESS_syn1_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_syn1_v_pro1)
   - [STRESS_syn4_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_syn4_v_pro1).  
-  Details: L19 set path to `data/Fig8a`, L184 and L457 requires low coverage genes and expression data obtained from `downstream_analyses/supplementary_results/RNAseq_edgeR_fullReport.Rmd`. L802 L1554 require setting the output folder for the output figures. The whole script includes more comparisons than needed, you can exclude steps using the naturals `ALK` and `TKS`.
+  Details: L19 set path to `data/Fig7a`, L184 and L457 requires low coverage genes and expression data obtained from `downstream_analyses/supplementary_results/RNAseq_edgeR_fullReport.Rmd`. L802 L1554 require setting the output folder for the output figures. The whole script includes more comparisons than needed, you can exclude steps using the naturals `ALK` and `TKS`.
 
-### Figure 8b
+### Figure7b
 
 Package requirements: `tidyverse`, `patchwork` , `VennDiagram`, `ggVennDiagram`, `RColorBrewer` and `svglite`  
-Script: `Fig8b_overlapDEGConditions.R`  
+Script: `Fig7b_overlapDEGConditions.R`  
 Data: expression data obtained from `downstream_analyses/supplementary_results/RNAseq_edgeR_fullReport.Rmd`  
 Details: L16 requires to set a path to DEGs and L18 a path to low coverage genes, all obtained from `RNAseq_edgeR_fullReport.Rmd`. L48 requires to set an output folder for the figures.  

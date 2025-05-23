@@ -16,7 +16,7 @@ library(svglite)
 
 ### Import methylation data
 
-setwd("downstream_analyses/main_results/data/Fig8a/")
+setwd("downstream_analyses/main_results/data/Fig7a/")
 
 # Cold conditions (HM)
 
