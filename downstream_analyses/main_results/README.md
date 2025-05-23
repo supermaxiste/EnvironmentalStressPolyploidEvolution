@@ -101,12 +101,12 @@ Data: expression and low coverage genes data obtained from `downstream_analyses/
 Details: the script requires to define paths in L11-14 for low coverage genes and expression data obtained from `downstream_analyses/supplementary_results/RNAseq_edgeR_fullReport.Rmd`.  
 
 
-## Figure 7
+## Figure 6
 
 Package requirements: `tidyverse`, `data.table`, `DESeq2` and `ComplexHeatmap`  
-Script: `Fig7_ExpressionHeatmaps.R`  
-Data: `data/Fig7`, classical genome annotation files from TBD and count tables from TBD   
-Details: the script requires to define paths in L13-19 for the annotations, count tables and data from `data/Fig7`.
+Script: `Fig6_ExpressionHeatmaps.R`  
+Data: `data/Fig6`, including classical genome annotation files and count tables  
+Details: the script requires to define paths in L13-19 for the annotations, count tables and data from `data/Fig6`.
 
 ## Figure 8
 
