@@ -133,3 +133,16 @@ Data: 500bp promoter annotation files in `data/Fig5`, classical genome annotatio
   - [STRESS_syn1_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_syn1_v_pro1)
   - [STRESS_syn4_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_syn4_v_pro1)   
 Details: the script changes working directory 4 times, one for each of the outputs outlined above and requires 4 paths: 2 for annotations in `data/Fig5` and 2 for the classical annotations. Make sure to set the correct paths for lines 24, 30, 208, 220, 723, 743, 777, 797.
+
+### Figure 4abc
+
+Package requirements: `tidyverse`, `data.table`, `patchwork` and `GenomicRanges`  
+Script: `Fig4abc_DMRs_g4v1.R`.  
+Data: `dmrseq` output from the ARPEGGIO pipeline, specifically progenitors and naturals where we compare generation 1 vs generation 4 (both conditions):
+  - [MILD_pro1_v_pro4](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_pro1_v_pro4)
+  - [MILD_alk1_v_alk4](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_alk1_v_alk4)
+  - [MILD_tks1_v_tks5](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_tks1_v_tks5)
+  - [STRESS_pro1_v_pro4](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_pro1_v_pro4)
+  - [STRESS_alk1_v_alk4](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_alk1_v_alk4)
+  - [STRESS_tks1_v_tks5](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_tks1_v_tks5)  
+Details: L15 path to `MILD_alk1_v_alk4` output, L159 path to `STRESS_alk1_v_alk4` output. L189-190 to `data/Fig4c`. L303 and L443 for `MILD_tks1_v_tks5` and `STRESS_tks1_v_tks5` output respectively. L582 and L586 for `MILD_pro1_v_pro4` for each parental side. L711 and L715 for `STRESS_pro1_v_pro4` for each parental side.
