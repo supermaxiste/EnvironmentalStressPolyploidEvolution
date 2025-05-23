@@ -84,19 +84,19 @@ Data: `dmrseq` output from the ARPEGGIO pipeline, specifically alk & tks generat
   - [STRESS_tks1_v_syn4](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_tks1_v_syn4)   
 Details: the script changes working directory 12 times, one for each of the outputs outlined above and requires 4 paths to the data in `data/Fig4c`. Make sure to set the correct paths for lines 13, 33, 35, 99, 189, 329, 408, 497, 638, 658, 660, 725, 814, 954, 1033 and 1122.
 
-## Figure 6
+## Figure 5
 
-### Figure 6a
+### Figure 5a
 
 Package requirements: `edgeR`, `data.table` and `ggplot2`  
 Script: `RNAseq_edgeR_fullReport.Rmd`  
 Data: output counts from the [RNAseq analyses](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/RNAseq)  
 Details: the easiest way to run this R Markdown file is to do so interactively. L17, L41-45 and L53 require to set paths to the required files.  
 
-### Figure 6bcde
+### Figure 5bcde
 
 Package requirements: `tidyverse` and `patchwork` 
-Script: `Fig6bcde_DEGBarplots.R`  
+Script: `Fig5bcde_DEGBarplots.R`  
 Data: expression and low coverage genes data obtained from `downstream_analyses/supplementary_results/RNAseq_edgeR_fullReport.Rmd`    
 Details: the script requires to define paths in L11-14 for low coverage genes and expression data obtained from `downstream_analyses/supplementary_results/RNAseq_edgeR_fullReport.Rmd`.  
 
