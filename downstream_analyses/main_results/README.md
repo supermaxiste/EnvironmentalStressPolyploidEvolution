@@ -39,31 +39,21 @@ Script: `Fig3c_enrichmentPlot.R`
 Data: `data/Fig3c`  
 Details: To find out how to obtain the data used, refer to the `METHImpute_analyses` folder from the main repository ([direct link](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/METHImpute_analyses)).
 
-## Figure 3
+## Figure 4
 
-### Figure 3a
+### Figure 4a
 
 Package requirements: `tidyverse`, `data.table` and `patchwork`  
-Script: `Fig3a_DMRBarplots_conditions.R`.  
+Script: `Fig4a_DMRBarplots_conditions.R`.  
 Data: `dmrseq` output from the ARPEGGIO pipeline, specifically synthetics generations  vs generation 4 (both conditions):
   - [MILD_syn1_v_syn4](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_syn1_v_syn4)
   - [STRESS_syn1_v_syn4](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_syn1_v_syn4)
 
-### Figure 3b
+
+### Figure 4c
 
 Package requirements: `tidyverse`, `data.table` and `patchwork`  
-Script: `Fig3b_DMRBarplot.R`.  
-Data: `dmrseq` output from the ARPEGGIO pipeline, specifically synthetics generations 1 & 4 vs progenitors from generation 1 (both conditions):
-  - [MILD_syn1_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_syn1_v_pro1)
-  - [MILD_syn4_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_syn4_v_pro1)
-  - [STRESS_syn1_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_syn1_v_pro1)
-  - [STRESS_syn4_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_syn4_v_pro1).  
-Details: the script changes working directory 4 times, one for each of the outputs outlined above. Make sure to set the correct paths for lines 13, 62, 155 and 202
-
-### Figure 3c
-
-Package requirements: `tidyverse`, `data.table` and `patchwork`  
-Script: `Fig3c_DMRLineplot.R`.  
+Script: `Fig4c_DMRLineplot.R`.  
 Data: `dmrseq` output from the ARPEGGIO pipeline, specifically alk & tks generation 1 vs progenitors generation 1 and synthetics generation 1 & 4 (both conditions):
   - [MILD_alk1_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_alk1_v_pro1)
   - [MILD_alk1_v_syn1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_alk1_v_syn1)
@@ -93,18 +83,6 @@ Data: `dmrseq` output from the ARPEGGIO pipeline, specifically progenitors and n
   - [STRESS_alk1_v_alk4](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_alk1_v_alk4)
   - [STRESS_tks1_v_tks5](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_tks1_v_tks5)  
 Details: L15 path to `MILD_alk1_v_alk4` output, L159 path to `STRESS_alk1_v_alk4` output. L189-190 to `data/Fig4c`. L303 and L443 for `MILD_tks1_v_tks5` and `STRESS_tks1_v_tks5` output respectively. L582 and L586 for `MILD_pro1_v_pro4` for each parental side. L711 and L715 for `STRESS_pro1_v_pro4` for each parental side.
-
-## Figure 5
-
-Package requirements: `grid`, `gridExtra`, `tidyverse`, `data.table`, `GenomicRanges` and `patchwork`  
-Script: `Fig5_DonutPlot.R`.  
-Data: 500bp promoter annotation files in `data/Fig5`, classical genome annotation files from TBD and the same `drmseq` output `dmrseq` data in `data/Fig6a`:  
-  - [MILD_syn1_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_syn1_v_pro1)
-  - [MILD_syn4_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/MILD_syn4_v_pro1)
-  - [STRESS_syn1_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_syn1_v_pro1)
-  - [STRESS_syn4_v_pro1](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses/STRESS_syn4_v_pro1)   
-Details: the script changes working directory 4 times, one for each of the outputs outlined above and requires 4 paths: 2 for annotations in `data/Fig5` and 2 for the classical annotations. Make sure to set the correct paths for lines 24, 30, 208, 220, 723, 743, 777, 797.
-
 
 ## Figure 6
 
