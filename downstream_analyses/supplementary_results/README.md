@@ -2,19 +2,25 @@
 
 To find which script is related to which supplementary result and the data required, use the index below to navigate the sections.
 
- - [Figure S1](#figure-s1): Genome-wide coverage on both conditions and both progenitor's sides highlighting homoeologous exchange (HE) events.
- - [Figure S2-3](#figure-s2-3): MDS plots of the methylation state in all samples for different cytosine thresholds.
- - [Figure S4](#figure-s4): Barplots of the DMRs obtained from comparing synthetic *A. kamchatica* from the same generation across conditions. 
- - [Figure S5](#figure-s5): Barplots of the DMRs obtained from comparing natural polyploids and diploids across generations. First generations were used as a reference against fourth/fifth generations.
- - [Figure S6-7](#figure-s6-7): TBD
- - [Figure S8](#figure-s8): TBD
- - [Figure S9](#figure-s9): TBD
- - [Figure S10](#figure-s10): TBD
- - [Figure S11](#figure-s11): TBD
- - [Figure S12-13](#figure-s12-13): TBD
- - [Figure S14](#figure-s14): TBD
- - [Figure S15](#figure-s15): TBD
- - [Figure S16-22](#figure-s16-22): TBD
+ - [Figure S2](#figure-s2): BS-seq coverage per chromosome compared to DMR density, DEG density and HE,non-HE regions
+ - [Figure S3](#figure-s3): DNA-seq coverage per chromosome compared to DMR density and HE,non-HE regions
+ - [Figure S4](#figure-s4): Density distribution of DMRs across chromosomes (synthetic G4 vs natural ALK G4)
+ - [Figure S5](#figure-s5): MDS plots of the methylation state in all samples for different cytosine thresholds.
+ - [Figure S6](#figure-s6): Differentially methylated regions for G1 vs G4-5 for progenitors, natural ALK & TKS
+ - [Figure S7](#figure-s7): Differentially methylated regions for natural ALK G1 vs TKS G1
+ - [Figure S8](#figure-s8): Differentially mehylated regions for:
+     - P G1 vs S G1-G4
+     - ALK G1 vs S G1-G4  
+     - TKS G1 vs S G1-G4  
+     - P G1 vs ALK G1-G4  
+     - P G1 vs TKS G1-G5
+ - [Figure S9](#figure-s9): Donut plot with proportion of DMRs contexts for P G1 vs S G1-G4
+ - [Figure S10](#figure-s10): Differentially expressed genes for P G1 vs S G1-G4
+ - [Figure S11](#figure-s11): Chisqure tests for overlaps between DMGs & DEGs
+ - [Figure S12](#figure-s12): Relationship and correlation between expression and methylation changes P G1 vs S G1
+ - [Figure S13](#figure-s13): BS-seq coverage of natural ALK & TKS samples
+ - [Figure S14](#figure-s14): Overlap across comparisons for tetraploid-specific genes
+
 
 
 ## Figure S1
@@ -38,10 +44,10 @@ Script: `FigS4_DMRBarplots_conditions.R`
 Data: ARPEGGIO results for HM vs LL synthetics G1 and G4 (link TBD)  
 Details: L12 and L120 need to be changed to the path of the corresponding datasets.
 
-## Figure S5
+## Figure S6
 
 Package requirements: `tidyverse`, `data.table`, `patchwork` and `GenomicRanges`
-Script:  `FigS5_DMRs_g4v1.R`
+Script:  `FigS6_DMRs_g4v1.R`
 Data: from [ARPEGGIO analyses](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses), specifically:  
   - `MILD_alk1_v_alk4` & `STRESS_alk1_v_alk4`
   - `MILD_tks1_v_tks5` & `STRESS_tks1_v_tks5`
@@ -62,55 +68,6 @@ Package requirements: TBD
 Script: `FigS8_chisquare.R`  
 Data: from [ARPEGGIO analyses](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/ARPEGGIO_analyses) and [low coverage regions](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/downstream_analyses/main_results/data/Fig4c).  
 Details: L18 has to be set for the `ARPEGGIO_analyses` folder. L184-185 and L187-188 have paths to be changed for files about low coverage regions.  
-
-## Figure S9
-
-Package requirements:  
-Script:  
-Data:   
-Details: 
-
-## Figure S10
-
-Package requirements:  
-Script:  
-Data:   
-Details: 
-
-## Figure S11
-
-Package requirements:  
-Script:  
-Data:   
-Details: 
-
-## Figure S12-13
-
-Package requirements:  
-Script:  
-Data:   
-Details: 
-
-## Figure S14
-
-Package requirements:  
-Script:  
-Data:   
-Details: 
-
-## Figure S15
-
-Package requirements:  
-Script: 
-Data:   
-Details: 
-
-## Figure S16-22
-
-Package requirements: 
-Script:   
-Data:   
-Details: 
 
 ### Figure 3b
 
