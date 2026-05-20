@@ -2,7 +2,7 @@
 
 This repository contains all the scripts associated to the paper:
 
-*Convergence and divergence of DNA methylation and gene expression patterns in neopolyploid of Arabidopsis kamchatica*, _Milosavljevic_ et al. (2025)
+*Convergence and divergence of DNA methylation and gene expression patterns in neopolyploid Arabidopsis kamchatica*, _Milosavljevic_ et al. (2026)
 
 Each folder includes different stages and output of the analyses:
 
