@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/549570627.svg)](https://doi.org/10.5281/zenodo.20304945)
+
 # Overview
 
 This repository contains all the scripts associated to the paper:
