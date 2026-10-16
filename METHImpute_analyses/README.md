@@ -4,7 +4,7 @@ All the analyses with [METHImpute](https://bioconductor.org/packages/3.14/bioc/h
 
  1) Bismark outputs with information about all cytosines in the genome. These outputs are named `sample.CX_report.txt` and can be found at LINK TBD
 
- 2) Annotation files in `gff` format for the species of interest. These can be downloaded here: LINK TBD
+ 2) Annotation files in `gff` format for the species of interest. These can be downloaded here: [LINK](https://github.com/supermaxiste/EnvironmentalStressPolyploidEvolution/tree/main/downstream_analyses/main_results/data/annotations)
  
  3) The R package `methimpute` installed. To install it, find instructions [here](https://bioconductor.org/packages/release/bioc/html/methimpute.html) or create a `conda` environment using the `methimpute.yaml` file.
 
